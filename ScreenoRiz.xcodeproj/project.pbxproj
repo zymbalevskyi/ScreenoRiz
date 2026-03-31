@@ -3,8 +3,13 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 90;
 	objects = {
+
+/* Begin PBXBuildFile section */
+		CEEC445F2F66B67F00E21C1A /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEEC445E2F66B67F00E21C1A /* DeviceActivity.framework */; };
+		CEEC44672F66B67F00E21C1A /* ScreenoRizMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = CEEC445C2F66B67F00E21C1A /* ScreenoRizMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		CE9A0D1D2F5326580053D1CD /* PBXContainerItemProxy */ = {
@@ -21,17 +26,58 @@
 			remoteGlobalIDString = CE9A0D0E2F5326560053D1CD;
 			remoteInfo = ScreenoRiz;
 		};
+		CEEC44652F66B67F00E21C1A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CE9A0D072F5326560053D1CD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CEEC445B2F66B67F00E21C1A;
+			remoteInfo = ScreenoRizMonitor;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		CEEC446C2F66B67F00E21C1A /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			dstPath = "";
+			dstSubfolder = PlugIns;
+			files = (
+				CEEC44672F66B67F00E21C1A /* ScreenoRizMonitor.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		CE9A0D0F2F5326570053D1CD /* ScreenoRiz.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScreenoRiz.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE9A0D1C2F5326580053D1CD /* ScreenoRizTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScreenoRizTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE9A0D262F5326580053D1CD /* ScreenoRizUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScreenoRizUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CEEC445C2F66B67F00E21C1A /* ScreenoRizMonitor.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ScreenoRizMonitor.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		CEEC445E2F66B67F00E21C1A /* DeviceActivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DeviceActivity.framework; path = System/Library/Frameworks/DeviceActivity.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		CE9A0D612F53358E0053D1CD /* Exceptions for "ScreenoRiz" folder in "ScreenoRiz" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = CE9A0D0E2F5326560053D1CD /* ScreenoRiz */;
+		};
+		CEEC446B2F66B67F00E21C1A /* Exceptions for "ScreenoRizMonitor" folder in "ScreenoRizMonitor" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = CEEC445B2F66B67F00E21C1A /* ScreenoRizMonitor */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		CE9A0D112F5326570053D1CD /* ScreenoRiz */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				CE9A0D612F53358E0053D1CD /* Exceptions for "ScreenoRiz" folder in "ScreenoRiz" target */,
+			);
 			path = ScreenoRiz;
 			sourceTree = "<group>";
 		};
@@ -45,29 +91,37 @@
 			path = ScreenoRizUITests;
 			sourceTree = "<group>";
 		};
+		CEEC44602F66B67F00E21C1A /* ScreenoRizMonitor */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				CEEC446B2F66B67F00E21C1A /* Exceptions for "ScreenoRizMonitor" folder in "ScreenoRizMonitor" target */,
+			);
+			path = ScreenoRizMonitor;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		CE9A0D0C2F5326560053D1CD /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		CE9A0D192F5326580053D1CD /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		CE9A0D232F5326580053D1CD /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CEEC44592F66B67F00E21C1A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+				CEEC445F2F66B67F00E21C1A /* DeviceActivity.framework in Frameworks */,
+			);
 		};
 /* End PBXFrameworksBuildPhase section */
 
@@ -78,6 +132,8 @@
 				CE9A0D112F5326570053D1CD /* ScreenoRiz */,
 				CE9A0D1F2F5326580053D1CD /* ScreenoRizTests */,
 				CE9A0D292F5326580053D1CD /* ScreenoRizUITests */,
+				CEEC44602F66B67F00E21C1A /* ScreenoRizMonitor */,
+				CEEC445D2F66B67F00E21C1A /* Frameworks */,
 				CE9A0D102F5326570053D1CD /* Products */,
 			);
 			sourceTree = "<group>";
@@ -88,8 +144,17 @@
 				CE9A0D0F2F5326570053D1CD /* ScreenoRiz.app */,
 				CE9A0D1C2F5326580053D1CD /* ScreenoRizTests.xctest */,
 				CE9A0D262F5326580053D1CD /* ScreenoRizUITests.xctest */,
+				CEEC445C2F66B67F00E21C1A /* ScreenoRizMonitor.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		CEEC445D2F66B67F00E21C1A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				CEEC445E2F66B67F00E21C1A /* DeviceActivity.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -102,17 +167,17 @@
 				CE9A0D0B2F5326560053D1CD /* Sources */,
 				CE9A0D0C2F5326560053D1CD /* Frameworks */,
 				CE9A0D0D2F5326560053D1CD /* Resources */,
+				CEEC446C2F66B67F00E21C1A /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				CEEC44662F66B67F00E21C1A /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				CE9A0D112F5326570053D1CD /* ScreenoRiz */,
 			);
 			name = ScreenoRiz;
-			packageProductDependencies = (
-			);
 			productName = ScreenoRiz;
 			productReference = CE9A0D0F2F5326570053D1CD /* ScreenoRiz.app */;
 			productType = "com.apple.product-type.application";
@@ -134,8 +199,6 @@
 				CE9A0D1F2F5326580053D1CD /* ScreenoRizTests */,
 			);
 			name = ScreenoRizTests;
-			packageProductDependencies = (
-			);
 			productName = ScreenoRizTests;
 			productReference = CE9A0D1C2F5326580053D1CD /* ScreenoRizTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -157,11 +220,27 @@
 				CE9A0D292F5326580053D1CD /* ScreenoRizUITests */,
 			);
 			name = ScreenoRizUITests;
-			packageProductDependencies = (
-			);
 			productName = ScreenoRizUITests;
 			productReference = CE9A0D262F5326580053D1CD /* ScreenoRizUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		CEEC445B2F66B67F00E21C1A /* ScreenoRizMonitor */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CEEC44682F66B67F00E21C1A /* Build configuration list for PBXNativeTarget "ScreenoRizMonitor" */;
+			buildPhases = (
+				CEEC44582F66B67F00E21C1A /* Sources */,
+				CEEC44592F66B67F00E21C1A /* Frameworks */,
+				CEEC445A2F66B67F00E21C1A /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				CEEC44602F66B67F00E21C1A /* ScreenoRizMonitor */,
+			);
+			name = ScreenoRizMonitor;
+			productName = ScreenoRizMonitor;
+			productReference = CEEC445C2F66B67F00E21C1A /* ScreenoRizMonitor.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -184,6 +263,9 @@
 						CreatedOnToolsVersion = 26.3;
 						TestTargetID = CE9A0D0E2F5326560053D1CD;
 					};
+					CEEC445B2F66B67F00E21C1A = {
+						CreatedOnToolsVersion = 26.3;
+					};
 				};
 			};
 			buildConfigurationList = CE9A0D0A2F5326560053D1CD /* Build configuration list for PBXProject "ScreenoRiz" */;
@@ -195,7 +277,7 @@
 			);
 			mainGroup = CE9A0D062F5326560053D1CD;
 			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 77;
+			preferredProjectObjectVersion = 90;
 			productRefGroup = CE9A0D102F5326570053D1CD /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -203,6 +285,7 @@
 				CE9A0D0E2F5326560053D1CD /* ScreenoRiz */,
 				CE9A0D1B2F5326580053D1CD /* ScreenoRizTests */,
 				CE9A0D252F5326580053D1CD /* ScreenoRizUITests */,
+				CEEC445B2F66B67F00E21C1A /* ScreenoRizMonitor */,
 			);
 		};
 /* End PBXProject section */
@@ -210,48 +293,46 @@
 /* Begin PBXResourcesBuildPhase section */
 		CE9A0D0D2F5326560053D1CD /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		CE9A0D1A2F5326580053D1CD /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		CE9A0D242F5326580053D1CD /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CEEC445A2F66B67F00E21C1A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		CE9A0D0B2F5326560053D1CD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		CE9A0D182F5326580053D1CD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		CE9A0D222F5326580053D1CD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CEEC44582F66B67F00E21C1A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
 		};
 /* End PBXSourcesBuildPhase section */
 
@@ -266,10 +347,15 @@
 			target = CE9A0D0E2F5326560053D1CD /* ScreenoRiz */;
 			targetProxy = CE9A0D272F5326580053D1CD /* PBXContainerItemProxy */;
 		};
+		CEEC44662F66B67F00E21C1A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CEEC445B2F66B67F00E21C1A /* ScreenoRizMonitor */;
+			targetProxy = CEEC44652F66B67F00E21C1A /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		CE9A0D2E2F5326580053D1CD /* Debug */ = {
+		CE9A0D2E2F5326580053D1CD /* Debug configuration for PBXProject "ScreenoRiz" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -331,7 +417,7 @@
 			};
 			name = Debug;
 		};
-		CE9A0D2F2F5326580053D1CD /* Release */ = {
+		CE9A0D2F2F5326580053D1CD /* Release configuration for PBXProject "ScreenoRiz" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -385,11 +471,12 @@
 			};
 			name = Release;
 		};
-		CE9A0D312F5326580053D1CD /* Debug */ = {
+		CE9A0D312F5326580053D1CD /* Debug configuration for PBXNativeTarget "ScreenoRiz" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = ScreenoRiz/ScreenoRiz.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = LTD9D9HKZL;
@@ -398,42 +485,50 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ScreenoRiz/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ScreenoRiz;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				INFOPLIST_KEY_UIStatusBarHidden = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDarkContent;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = zymbalevskyi.ScreenoRiz;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.zymbalevskyi.ScreenoRiz;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = 1;
 				XROS_DEPLOYMENT_TARGET = 26.2;
 			};
 			name = Debug;
 		};
-		CE9A0D322F5326580053D1CD /* Release */ = {
+		CE9A0D322F5326580053D1CD /* Release configuration for PBXNativeTarget "ScreenoRiz" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = ScreenoRiz/ScreenoRizRelease.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = LTD9D9HKZL;
@@ -442,38 +537,45 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ScreenoRiz/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ScreenoRiz;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				INFOPLIST_KEY_UIStatusBarHidden = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDarkContent;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = zymbalevskyi.ScreenoRiz;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.zymbalevskyi.ScreenoRiz;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = 1;
 				XROS_DEPLOYMENT_TARGET = 26.2;
 			};
 			name = Release;
 		};
-		CE9A0D342F5326580053D1CD /* Debug */ = {
+		CE9A0D342F5326580053D1CD /* Debug configuration for PBXNativeTarget "ScreenoRizTests" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -499,7 +601,7 @@
 			};
 			name = Debug;
 		};
-		CE9A0D352F5326580053D1CD /* Release */ = {
+		CE9A0D352F5326580053D1CD /* Release configuration for PBXNativeTarget "ScreenoRizTests" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -525,7 +627,7 @@
 			};
 			name = Release;
 		};
-		CE9A0D372F5326580053D1CD /* Debug */ = {
+		CE9A0D372F5326580053D1CD /* Debug configuration for PBXNativeTarget "ScreenoRizUITests" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -550,7 +652,7 @@
 			};
 			name = Debug;
 		};
-		CE9A0D382F5326580053D1CD /* Release */ = {
+		CE9A0D382F5326580053D1CD /* Release configuration for PBXNativeTarget "ScreenoRizUITests" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -572,6 +674,73 @@
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_TARGET_NAME = ScreenoRiz;
 				XROS_DEPLOYMENT_TARGET = 26.2;
+			};
+			name = Release;
+		};
+		CEEC44692F66B67F00E21C1A /* Debug configuration for PBXNativeTarget "ScreenoRizMonitor" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ScreenoRizMonitor/ScreenoRizMonitor.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LTD9D9HKZL;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ScreenoRizMonitor/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ScreenoRizMonitor;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.zymbalevskyi.ScreenoRiz.ScreenoRizMonitor;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CEEC446A2F66B67F00E21C1A /* Release configuration for PBXNativeTarget "ScreenoRizMonitor" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ScreenoRizMonitor/ScreenoRizMonitorRelease.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LTD9D9HKZL;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ScreenoRizMonitor/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ScreenoRizMonitor;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.zymbalevskyi.ScreenoRiz.ScreenoRizMonitor;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -581,37 +750,41 @@
 		CE9A0D0A2F5326560053D1CD /* Build configuration list for PBXProject "ScreenoRiz" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				CE9A0D2E2F5326580053D1CD /* Debug */,
-				CE9A0D2F2F5326580053D1CD /* Release */,
+				CE9A0D2E2F5326580053D1CD /* Debug configuration for PBXProject "ScreenoRiz" */,
+				CE9A0D2F2F5326580053D1CD /* Release configuration for PBXProject "ScreenoRiz" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		CE9A0D302F5326580053D1CD /* Build configuration list for PBXNativeTarget "ScreenoRiz" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				CE9A0D312F5326580053D1CD /* Debug */,
-				CE9A0D322F5326580053D1CD /* Release */,
+				CE9A0D312F5326580053D1CD /* Debug configuration for PBXNativeTarget "ScreenoRiz" */,
+				CE9A0D322F5326580053D1CD /* Release configuration for PBXNativeTarget "ScreenoRiz" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		CE9A0D332F5326580053D1CD /* Build configuration list for PBXNativeTarget "ScreenoRizTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				CE9A0D342F5326580053D1CD /* Debug */,
-				CE9A0D352F5326580053D1CD /* Release */,
+				CE9A0D342F5326580053D1CD /* Debug configuration for PBXNativeTarget "ScreenoRizTests" */,
+				CE9A0D352F5326580053D1CD /* Release configuration for PBXNativeTarget "ScreenoRizTests" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		CE9A0D362F5326580053D1CD /* Build configuration list for PBXNativeTarget "ScreenoRizUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				CE9A0D372F5326580053D1CD /* Debug */,
-				CE9A0D382F5326580053D1CD /* Release */,
+				CE9A0D372F5326580053D1CD /* Debug configuration for PBXNativeTarget "ScreenoRizUITests" */,
+				CE9A0D382F5326580053D1CD /* Release configuration for PBXNativeTarget "ScreenoRizUITests" */,
 			);
-			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CEEC44682F66B67F00E21C1A /* Build configuration list for PBXNativeTarget "ScreenoRizMonitor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CEEC44692F66B67F00E21C1A /* Debug configuration for PBXNativeTarget "ScreenoRizMonitor" */,
+				CEEC446A2F66B67F00E21C1A /* Release configuration for PBXNativeTarget "ScreenoRizMonitor" */,
+			);
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
