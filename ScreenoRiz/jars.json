@@ -1,0 +1,56 @@
+[
+  {
+    "id": "7r7v7wVLJv",
+    "name": "Купʼянські Вампіри",
+    "fundName": "БФ Хартія",
+    "jarType": "gather",
+    "url": "https://send.monobank.ua/jar/7r7v7wVLJv",
+    "coverAsset": "jar-cover-7r7v7wVLJv",
+    "logoAsset": "jar-logo-7r7v7wVLJv"
+  },
+  {
+    "id": "6RLCTJtkYV",
+    "name": "Збір на евакуацію та допомогу пораненим і хворим тваринам",
+    "fundName": "CF UANIMALS",
+    "jarType": "gather",
+    "url": "https://send.monobank.ua/jar/6RLCTJtkYV",
+    "coverAsset": "jar-cover-6RLCTJtkYV",
+    "logoAsset": "jar-logo-6RLCTJtkYV"
+  },
+  {
+    "id": "2JbpBYkhMv",
+    "name": "Поточний RUSORIZ",
+    "fundName": "БФ СПІЛЬНОТА СТЕРНЕНКА",
+    "jarType": "gather",
+    "url": "https://send.monobank.ua/jar/2JbpBYkhMv",
+    "coverAsset": "jar-cover-2JbpBYkhMv",
+    "logoAsset": "jar-logo-2JbpBYkhMv"
+  },
+  {
+    "id": "A6ExTgYxLa",
+    "name": "Котики Азову",
+    "fundName": "AZOV ONE",
+    "jarType": "gather",
+    "url": "https://send.monobank.ua/jar/A6ExTgYxLa",
+    "coverAsset": "jar-cover-A6ExTgYxLa",
+    "logoAsset": "jar-logo-A6ExTgYxLa"
+  },
+  {
+    "id": "7VuHWj7Eyx",
+    "name": "Влаштуємо ворогам дронопад!",
+    "fundName": "CF COME BACK ALIVE",
+    "jarType": "gather",
+    "url": "https://send.monobank.ua/jar/7VuHWj7Eyx",
+    "coverAsset": "jar-cover-7VuHWj7Eyx",
+    "logoAsset": "jar-logo-7VuHWj7Eyx"
+  },
+  {
+    "id": "8VKoiC3p6q",
+    "name": "Шахедоріз",
+    "fundName": "СПІЛЬНОТА СТЕРНЕНКА",
+    "jarType": "gather",
+    "url": "https://send.monobank.ua/jar/8VKoiC3p6q",
+    "coverAsset": "jar-cover-8VKoiC3p6q",
+    "logoAsset": "jar-logo-8VKoiC3p6q"
+  }
+]

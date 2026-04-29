@@ -7,11 +7,42 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BB0000022F66000000000001 /* ManagedSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB0000012F66000000000001 /* ManagedSettings.framework */; };
+		BB0000032F66000000000001 /* ManagedSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB0000012F66000000000001 /* ManagedSettings.framework */; };
+		BB0000042F66000000000001 /* ManagedSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB0000012F66000000000001 /* ManagedSettings.framework */; };
+		BB0000052F66000000000001 /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEEC445E2F66B67F00E21C1A /* DeviceActivity.framework */; };
+		BB0000072F66000000000001 /* ManagedSettingsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB0000062F66000000000001 /* ManagedSettingsUI.framework */; };
+		BB0100022F66000000000001 /* ScreenoRizShieldConfig.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BB0100012F66000000000001 /* ScreenoRizShieldConfig.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		BB0200022F66000000000001 /* ScreenoRizShieldAction.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BB0200012F66000000000001 /* ScreenoRizShieldAction.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CE3B9A9C2F8AAE9800675A1A /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE3B9A9B2F8AAE9800675A1A /* WidgetKit.framework */; };
+		CE3B9A9E2F8AAE9900675A1A /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE3B9A9D2F8AAE9800675A1A /* SwiftUI.framework */; };
+		CE3B9AAF2F8AAE9A00675A1A /* ScreenoRizWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = CE3B9A9A2F8AAE9800675A1A /* ScreenoRizWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CEEC445F2F66B67F00E21C1A /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEEC445E2F66B67F00E21C1A /* DeviceActivity.framework */; };
 		CEEC44672F66B67F00E21C1A /* ScreenoRizMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = CEEC445C2F66B67F00E21C1A /* ScreenoRizMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		BB0100092F66000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CE9A0D072F5326560053D1CD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BB0100082F66000000000001;
+			remoteInfo = ScreenoRizShieldConfig;
+		};
+		BB0200092F66000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CE9A0D072F5326560053D1CD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BB0200082F66000000000001;
+			remoteInfo = ScreenoRizShieldAction;
+		};
+		CE3B9AAD2F8AAE9A00675A1A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CE9A0D072F5326560053D1CD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CE3B9A992F8AAE9800675A1A;
+			remoteInfo = ScreenoRizWidgetExtension;
+		};
 		CE9A0D1D2F5326580053D1CD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CE9A0D072F5326560053D1CD /* Project object */;
@@ -41,13 +72,23 @@
 			dstPath = "";
 			dstSubfolder = PlugIns;
 			files = (
+				CE3B9AAF2F8AAE9A00675A1A /* ScreenoRizWidgetExtension.appex in Embed Foundation Extensions */,
 				CEEC44672F66B67F00E21C1A /* ScreenoRizMonitor.appex in Embed Foundation Extensions */,
+				BB0100022F66000000000001 /* ScreenoRizShieldConfig.appex in Embed Foundation Extensions */,
+				BB0200022F66000000000001 /* ScreenoRizShieldAction.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		BB0000012F66000000000001 /* ManagedSettings.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ManagedSettings.framework; path = System/Library/Frameworks/ManagedSettings.framework; sourceTree = SDKROOT; };
+		BB0000062F66000000000001 /* ManagedSettingsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ManagedSettingsUI.framework; path = System/Library/Frameworks/ManagedSettingsUI.framework; sourceTree = SDKROOT; };
+		BB0100012F66000000000001 /* ScreenoRizShieldConfig.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ScreenoRizShieldConfig.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB0200012F66000000000001 /* ScreenoRizShieldAction.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ScreenoRizShieldAction.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE3B9A9A2F8AAE9800675A1A /* ScreenoRizWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ScreenoRizWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE3B9A9B2F8AAE9800675A1A /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		CE3B9A9D2F8AAE9800675A1A /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		CE9A0D0F2F5326570053D1CD /* ScreenoRiz.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScreenoRiz.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE9A0D1C2F5326580053D1CD /* ScreenoRizTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScreenoRizTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE9A0D262F5326580053D1CD /* ScreenoRizUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScreenoRizUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -56,6 +97,27 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		BB0100042F66000000000001 /* Exceptions for "ScreenoRizShieldConfig" folder in "ScreenoRizShieldConfig" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = BB0100082F66000000000001 /* ScreenoRizShieldConfig */;
+		};
+		BB0200042F66000000000001 /* Exceptions for "ScreenoRizShieldAction" folder in "ScreenoRizShieldAction" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = BB0200082F66000000000001 /* ScreenoRizShieldAction */;
+		};
+		CE3B9AB32F8AAE9A00675A1A /* Exceptions for "ScreenoRizWidget" folder in "ScreenoRizWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = CE3B9A992F8AAE9800675A1A /* ScreenoRizWidgetExtension */;
+		};
 		CE9A0D612F53358E0053D1CD /* Exceptions for "ScreenoRiz" folder in "ScreenoRiz" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -73,6 +135,30 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		BB0100032F66000000000001 /* ScreenoRizShieldConfig */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BB0100042F66000000000001 /* Exceptions for "ScreenoRizShieldConfig" folder in "ScreenoRizShieldConfig" target */,
+			);
+			path = ScreenoRizShieldConfig;
+			sourceTree = "<group>";
+		};
+		BB0200032F66000000000001 /* ScreenoRizShieldAction */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BB0200042F66000000000001 /* Exceptions for "ScreenoRizShieldAction" folder in "ScreenoRizShieldAction" target */,
+			);
+			path = ScreenoRizShieldAction;
+			sourceTree = "<group>";
+		};
+		CE3B9A9F2F8AAE9900675A1A /* ScreenoRizWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				CE3B9AB32F8AAE9A00675A1A /* Exceptions for "ScreenoRizWidget" folder in "ScreenoRizWidgetExtension" target */,
+			);
+			path = ScreenoRizWidget;
+			sourceTree = "<group>";
+		};
 		CE9A0D112F5326570053D1CD /* ScreenoRiz */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -102,6 +188,27 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		BB0100062F66000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+				BB0000022F66000000000001 /* ManagedSettings.framework in Frameworks */,
+				BB0000072F66000000000001 /* ManagedSettingsUI.framework in Frameworks */,
+			);
+		};
+		BB0200062F66000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+				BB0000032F66000000000001 /* ManagedSettings.framework in Frameworks */,
+				BB0000052F66000000000001 /* DeviceActivity.framework in Frameworks */,
+			);
+		};
+		CE3B9A972F8AAE9800675A1A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+				CE3B9A9E2F8AAE9900675A1A /* SwiftUI.framework in Frameworks */,
+				CE3B9A9C2F8AAE9800675A1A /* WidgetKit.framework in Frameworks */,
+			);
+		};
 		CE9A0D0C2F5326560053D1CD /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
@@ -121,6 +228,7 @@
 			isa = PBXFrameworksBuildPhase;
 			files = (
 				CEEC445F2F66B67F00E21C1A /* DeviceActivity.framework in Frameworks */,
+				BB0000042F66000000000001 /* ManagedSettings.framework in Frameworks */,
 			);
 		};
 /* End PBXFrameworksBuildPhase section */
@@ -133,6 +241,9 @@
 				CE9A0D1F2F5326580053D1CD /* ScreenoRizTests */,
 				CE9A0D292F5326580053D1CD /* ScreenoRizUITests */,
 				CEEC44602F66B67F00E21C1A /* ScreenoRizMonitor */,
+				BB0100032F66000000000001 /* ScreenoRizShieldConfig */,
+				BB0200032F66000000000001 /* ScreenoRizShieldAction */,
+				CE3B9A9F2F8AAE9900675A1A /* ScreenoRizWidget */,
 				CEEC445D2F66B67F00E21C1A /* Frameworks */,
 				CE9A0D102F5326570053D1CD /* Products */,
 			);
@@ -145,6 +256,9 @@
 				CE9A0D1C2F5326580053D1CD /* ScreenoRizTests.xctest */,
 				CE9A0D262F5326580053D1CD /* ScreenoRizUITests.xctest */,
 				CEEC445C2F66B67F00E21C1A /* ScreenoRizMonitor.appex */,
+				BB0100012F66000000000001 /* ScreenoRizShieldConfig.appex */,
+				BB0200012F66000000000001 /* ScreenoRizShieldAction.appex */,
+				CE3B9A9A2F8AAE9800675A1A /* ScreenoRizWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -153,6 +267,10 @@
 			isa = PBXGroup;
 			children = (
 				CEEC445E2F66B67F00E21C1A /* DeviceActivity.framework */,
+				BB0000012F66000000000001 /* ManagedSettings.framework */,
+				BB0000062F66000000000001 /* ManagedSettingsUI.framework */,
+				CE3B9A9B2F8AAE9800675A1A /* WidgetKit.framework */,
+				CE3B9A9D2F8AAE9800675A1A /* SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -160,6 +278,60 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		BB0100082F66000000000001 /* ScreenoRizShieldConfig */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BB01000D2F66000000000001 /* Build configuration list for PBXNativeTarget "ScreenoRizShieldConfig" */;
+			buildPhases = (
+				BB0100052F66000000000001 /* Sources */,
+				BB0100062F66000000000001 /* Frameworks */,
+				BB0100072F66000000000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				BB0100032F66000000000001 /* ScreenoRizShieldConfig */,
+			);
+			name = ScreenoRizShieldConfig;
+			productName = ScreenoRizShieldConfig;
+			productReference = BB0100012F66000000000001 /* ScreenoRizShieldConfig.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		BB0200082F66000000000001 /* ScreenoRizShieldAction */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BB02000D2F66000000000001 /* Build configuration list for PBXNativeTarget "ScreenoRizShieldAction" */;
+			buildPhases = (
+				BB0200052F66000000000001 /* Sources */,
+				BB0200062F66000000000001 /* Frameworks */,
+				BB0200072F66000000000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				BB0200032F66000000000001 /* ScreenoRizShieldAction */,
+			);
+			name = ScreenoRizShieldAction;
+			productName = ScreenoRizShieldAction;
+			productReference = BB0200012F66000000000001 /* ScreenoRizShieldAction.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		CE3B9A992F8AAE9800675A1A /* ScreenoRizWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CE3B9AB22F8AAE9A00675A1A /* Build configuration list for PBXNativeTarget "ScreenoRizWidgetExtension" */;
+			buildPhases = (
+				CE3B9A962F8AAE9800675A1A /* Sources */,
+				CE3B9A972F8AAE9800675A1A /* Frameworks */,
+				CE3B9A982F8AAE9800675A1A /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				CE3B9A9F2F8AAE9900675A1A /* ScreenoRizWidget */,
+			);
+			name = ScreenoRizWidgetExtension;
+			productName = ScreenoRizWidgetExtension;
+			productReference = CE3B9A9A2F8AAE9800675A1A /* ScreenoRizWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		CE9A0D0E2F5326560053D1CD /* ScreenoRiz */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = CE9A0D302F5326580053D1CD /* Build configuration list for PBXNativeTarget "ScreenoRiz" */;
@@ -173,6 +345,9 @@
 			);
 			dependencies = (
 				CEEC44662F66B67F00E21C1A /* PBXTargetDependency */,
+				BB01000A2F66000000000001 /* PBXTargetDependency */,
+				BB02000A2F66000000000001 /* PBXTargetDependency */,
+				CE3B9AAE2F8AAE9A00675A1A /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				CE9A0D112F5326570053D1CD /* ScreenoRiz */,
@@ -249,9 +424,18 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2630;
-				LastUpgradeCheck = 2630;
+				LastSwiftUpdateCheck = 2640;
+				LastUpgradeCheck = 2640;
 				TargetAttributes = {
+					BB0100082F66000000000001 = {
+						CreatedOnToolsVersion = 26.3;
+					};
+					BB0200082F66000000000001 = {
+						CreatedOnToolsVersion = 26.3;
+					};
+					CE3B9A992F8AAE9800675A1A = {
+						CreatedOnToolsVersion = 26.4;
+					};
 					CE9A0D0E2F5326560053D1CD = {
 						CreatedOnToolsVersion = 26.3;
 					};
@@ -286,11 +470,29 @@
 				CE9A0D1B2F5326580053D1CD /* ScreenoRizTests */,
 				CE9A0D252F5326580053D1CD /* ScreenoRizUITests */,
 				CEEC445B2F66B67F00E21C1A /* ScreenoRizMonitor */,
+				BB0100082F66000000000001 /* ScreenoRizShieldConfig */,
+				BB0200082F66000000000001 /* ScreenoRizShieldAction */,
+				CE3B9A992F8AAE9800675A1A /* ScreenoRizWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		BB0100072F66000000000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		BB0200072F66000000000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		CE3B9A982F8AAE9800675A1A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
 		CE9A0D0D2F5326560053D1CD /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
@@ -314,6 +516,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		BB0100052F66000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		BB0200052F66000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		CE3B9A962F8AAE9800675A1A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
 		CE9A0D0B2F5326560053D1CD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
@@ -337,6 +554,21 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		BB01000A2F66000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BB0100082F66000000000001 /* ScreenoRizShieldConfig */;
+			targetProxy = BB0100092F66000000000001 /* PBXContainerItemProxy */;
+		};
+		BB02000A2F66000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BB0200082F66000000000001 /* ScreenoRizShieldAction */;
+			targetProxy = BB0200092F66000000000001 /* PBXContainerItemProxy */;
+		};
+		CE3B9AAE2F8AAE9A00675A1A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CE3B9A992F8AAE9800675A1A /* ScreenoRizWidgetExtension */;
+			targetProxy = CE3B9AAD2F8AAE9A00675A1A /* PBXContainerItemProxy */;
+		};
 		CE9A0D1E2F5326580053D1CD /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = CE9A0D0E2F5326560053D1CD /* ScreenoRiz */;
@@ -355,6 +587,205 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		BB01000B2F66000000000001 /* Debug configuration for PBXNativeTarget "ScreenoRizShieldConfig" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ScreenoRizShieldConfig/ScreenoRizShieldConfig.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LTD9D9HKZL;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ScreenoRizShieldConfig/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ScreenoRizShieldConfig;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.zymbalevskyi.ScreenoRiz.ScreenoRizShieldConfig;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BB01000C2F66000000000001 /* Release configuration for PBXNativeTarget "ScreenoRizShieldConfig" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ScreenoRizShieldConfig/ScreenoRizShieldConfigRelease.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LTD9D9HKZL;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ScreenoRizShieldConfig/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ScreenoRizShieldConfig;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.zymbalevskyi.ScreenoRiz.ScreenoRizShieldConfig;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		BB02000B2F66000000000001 /* Debug configuration for PBXNativeTarget "ScreenoRizShieldAction" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ScreenoRizShieldAction/ScreenoRizShieldAction.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LTD9D9HKZL;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ScreenoRizShieldAction/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ScreenoRizShieldAction;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.zymbalevskyi.ScreenoRiz.ScreenoRizShieldAction;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BB02000C2F66000000000001 /* Release configuration for PBXNativeTarget "ScreenoRizShieldAction" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ScreenoRizShieldAction/ScreenoRizShieldActionRelease.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LTD9D9HKZL;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ScreenoRizShieldAction/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ScreenoRizShieldAction;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.zymbalevskyi.ScreenoRiz.ScreenoRizShieldAction;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		CE3B9AB02F8AAE9A00675A1A /* Debug configuration for PBXNativeTarget "ScreenoRizWidgetExtension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LTD9D9HKZL;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ScreenoRizWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ScreenoRizWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.zymbalevskyi.ScreenoRiz.ScreenoRizWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CE3B9AB12F8AAE9A00675A1A /* Release configuration for PBXNativeTarget "ScreenoRizWidgetExtension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LTD9D9HKZL;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ScreenoRizWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ScreenoRizWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.zymbalevskyi.ScreenoRiz.ScreenoRizWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		CE9A0D2E2F5326580053D1CD /* Debug configuration for PBXProject "ScreenoRiz" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -389,6 +820,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = LTD9D9HKZL;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -412,6 +844,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -451,6 +884,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = LTD9D9HKZL;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -467,6 +901,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
@@ -478,7 +913,8 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ScreenoRiz/ScreenoRiz.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 0;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = LTD9D9HKZL;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -504,7 +940,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.2;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.zymbalevskyi.ScreenoRiz;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -528,9 +964,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ScreenoRiz/ScreenoRizRelease.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 0;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = LTD9D9HKZL;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -556,7 +992,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.2;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.zymbalevskyi.ScreenoRiz;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -581,6 +1017,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = LTD9D9HKZL;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
@@ -607,6 +1044,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = LTD9D9HKZL;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
@@ -632,6 +1070,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = LTD9D9HKZL;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
@@ -657,6 +1096,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = LTD9D9HKZL;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
@@ -714,7 +1154,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = ScreenoRizMonitor/ScreenoRizMonitorRelease.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = LTD9D9HKZL;
@@ -747,6 +1186,30 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		BB01000D2F66000000000001 /* Build configuration list for PBXNativeTarget "ScreenoRizShieldConfig" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BB01000B2F66000000000001 /* Debug configuration for PBXNativeTarget "ScreenoRizShieldConfig" */,
+				BB01000C2F66000000000001 /* Release configuration for PBXNativeTarget "ScreenoRizShieldConfig" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		BB02000D2F66000000000001 /* Build configuration list for PBXNativeTarget "ScreenoRizShieldAction" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BB02000B2F66000000000001 /* Debug configuration for PBXNativeTarget "ScreenoRizShieldAction" */,
+				BB02000C2F66000000000001 /* Release configuration for PBXNativeTarget "ScreenoRizShieldAction" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		CE3B9AB22F8AAE9A00675A1A /* Build configuration list for PBXNativeTarget "ScreenoRizWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CE3B9AB02F8AAE9A00675A1A /* Debug configuration for PBXNativeTarget "ScreenoRizWidgetExtension" */,
+				CE3B9AB12F8AAE9A00675A1A /* Release configuration for PBXNativeTarget "ScreenoRizWidgetExtension" */,
+			);
+			defaultConfigurationName = Release;
+		};
 		CE9A0D0A2F5326560053D1CD /* Build configuration list for PBXProject "ScreenoRiz" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

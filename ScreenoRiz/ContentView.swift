@@ -6,19 +6,36 @@
 //
 
 import SwiftUI
+import FamilyControls
 
 struct ContentView: View {
+    @EnvironmentObject var appState: AppState
+    @ObservedObject private var authCenter = AuthorizationCenter.shared
+    @Environment(\.scenePhase) private var scenePhase
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        Group {
+            if appState.hasCompletedOnboarding {
+                switch authCenter.authorizationStatus {
+                case .approved:
+                    HomeView()
+                case .notDetermined:
+                    // Status hasn't resolved yet — hold on a black screen to avoid
+                    // flashing PermissionDeniedView while FamilyControls initialises.
+                    Color.black.ignoresSafeArea()
+                default:
+                    PermissionDeniedView()
+                }
+            } else {
+                NavigationStack {
+                    SplashView()
+                }
+            }
         }
-        .padding()
     }
 }
 
 #Preview {
     ContentView()
+        .environmentObject(AppState())
 }

@@ -8,34 +8,16 @@
 import SwiftUI
 
 struct SplashView: View {
-    @State private var navigateToWelcome = false
+    @EnvironmentObject var appState: AppState
     
     var body: some View {
-        ZStack {
-            Color.black
-                .ignoresSafeArea()
-            
-            VStack {
-                Image(systemName: "sterlingsign.circle.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 120, height: 120)
-                    .foregroundStyle(.white)
-            }
-        }
-        .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                navigateToWelcome = true
-            }
-        }
-        .navigationDestination(isPresented: $navigateToWelcome) {
-            WelcomeView()
-        }
+        WelcomeView()
     }
 }
 
 #Preview {
     NavigationStack {
         SplashView()
+            .environmentObject(AppState())
     }
 }

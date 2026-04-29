@@ -28,6 +28,9 @@ struct LimitSelectionView: View {
             Color.black.ignoresSafeArea()
 
             VStack(spacing: 0) {
+                NavBar(onBack: { dismiss() })
+                    .padding(.horizontal, 32)
+
                 VStack(alignment: .leading, spacing: 12) {
                     Text("ліміти для застосунків")
                         .font(.ktfTitleLarge)
@@ -39,7 +42,7 @@ struct LimitSelectionView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 32)
-                .padding(.top, 72)
+                .padding(.top, 24)
                 .padding(.bottom, 24)
 
                 ScrollView {
@@ -64,35 +67,18 @@ struct LimitSelectionView: View {
                     .padding(.bottom, 20)
                 }
 
-                HStack(spacing: 16) {
-                    Button { dismiss() } label: {
-                        Image("icon-arrow-left")
-                            .resizable().frame(width: 20, height: 20)
-                            .foregroundStyle(.white)
-                            .frame(width: 60, height: 60)
-                            .background(
-                                RoundedRectangle(cornerRadius: 1000)
-                                    .fill(.white.opacity(0.15))
-                            )
-                    }
-
-                    Button {
-                        saveAllLimits()
-                        navigateToRate = true
-                    } label: {
-                        Text("продовжити")
-                            .font(.ktfTitleSmall)
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity, minHeight: 60)
-                            .background(
-                                RoundedRectangle(cornerRadius: 1000)
-                                    .fill(.white.opacity(0.15))
-                            )
-                    }
+                Button {
+                    saveAllLimits()
+                    navigateToRate = true
+                } label: {
+                    Text("продовжити")
+                        .font(.ktfTitle)
+                        .foregroundStyle(.black)
+                        .frame(maxWidth: .infinity, minHeight: 72)
+                        .background(Capsule().fill(.white))
                 }
                 .padding(.horizontal, 32)
                 .padding(.top, 16)
-                .padding(.bottom, 44)
             }
         }
         .navigationBarBackButtonHidden()
@@ -163,7 +149,7 @@ struct AppLimitRow: View {
 
             if isExpanded {
                 Rectangle()
-                    .fill(.white.opacity(0.1))
+                    .fill(Color(hex: "292929"))
                     .frame(height: 1)
 
                 VStack(alignment: .leading, spacing: 8) {
@@ -215,7 +201,7 @@ struct AppLimitRow: View {
                 }
             }
         }
-        .background(RoundedRectangle(cornerRadius: 16).fill(.white.opacity(0.1)))
+        .background(RoundedRectangle(cornerRadius: 16).fill(Color(hex: "121212")))
         .onAppear {
             selectedHours = totalMinutes / 60
             selectedMinutes = totalMinutes % 60

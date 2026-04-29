@@ -20,6 +20,9 @@ struct AppSelectionView: View {
             Color.black.ignoresSafeArea()
 
             VStack(spacing: 0) {
+                NavBar(onBack: { dismiss() })
+                    .padding(.horizontal, 32)
+
                 VStack(alignment: .leading, spacing: 8) {
                     Text("обери соцмережі")
                         .font(.ktfTitleLarge)
@@ -31,7 +34,7 @@ struct AppSelectionView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 32)
-                .padding(.top, 72)
+                .padding(.top, 24)
                 .padding(.bottom, 32)
 
                 // Picker trigger
@@ -51,35 +54,23 @@ struct AppSelectionView: View {
                             .foregroundStyle(.white.opacity(0.4))
                     }
                     .padding(16)
-                    .background(RoundedRectangle(cornerRadius: 16).fill(.white.opacity(0.1)))
+                    .background(RoundedRectangle(cornerRadius: 16).fill(Color(hex: "121212")))
                 }
                 .padding(.horizontal, 32)
 
                 Spacer()
 
-                HStack(spacing: 16) {
-                    Button { dismiss() } label: {
-                        Image("icon-arrow-left")
-                            .resizable().frame(width: 20, height: 20)
-                            .foregroundStyle(.white)
-                            .frame(width: 60, height: 60)
-                            .background(Circle().fill(.white.opacity(0.15)))
-                    }
-
-                    Button {
-                        navigateToLimit = true
-                    } label: {
-                        Text("продовжити")
-                            .font(.ktfTitleSmall)
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity, minHeight: 60)
-                            .background(Capsule().fill(.white.opacity(0.15)))
-                    }
-                    .disabled(selection.applicationTokens.isEmpty)
-                    .opacity(selection.applicationTokens.isEmpty ? 0.5 : 1.0)
+                Button {
+                    navigateToLimit = true
+                } label: {
+                    Text("продовжити")
+                        .font(.ktfTitle)
+                        .foregroundStyle(selection.applicationTokens.isEmpty ? Color(hex: "5E5E5E") : .black)
+                        .frame(maxWidth: .infinity, minHeight: 72)
+                        .background(Capsule().fill(selection.applicationTokens.isEmpty ? Color(hex: "292929") : .white))
                 }
+                .disabled(selection.applicationTokens.isEmpty)
                 .padding(.horizontal, 32)
-                .padding(.bottom, 44)
             }
         }
         .navigationBarBackButtonHidden(true)

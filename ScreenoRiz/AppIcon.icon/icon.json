@@ -19,6 +19,30 @@
     {
       "layers" : [
         {
+          "image-name" : "kitchen knife.svg",
+          "name" : "kitchen knife",
+          "position" : {
+            "scale" : 3.6,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "hidden" : true,
+      "layers" : [
+        {
           "image-name" : "1 2.svg",
           "name" : "1 2"
         },

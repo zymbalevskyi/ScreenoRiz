@@ -22,10 +22,15 @@ extension Font {
     // MARK: - KTF Prima Body
     
     /// Body - 15pt Regular
-    static let ktfBody = Font.custom("KTFPrima-Regular", size: 15)
+    static let ktfBody = Font.custom("KTFPrima-Light", size: 15)
     
     // MARK: - KTF Prima Caption
     
     /// Caption - 14pt Light
     static let ktfCaption = Font.custom("KTFPrima-Light", size: 14)
+    
+    // MARK: - KTF Prima Caption Small
+    
+    /// Caption Small  - 12pt Light
+    static let ktfCaptionSmall = Font.custom("KTFPrima-Light", size: 12)
 }

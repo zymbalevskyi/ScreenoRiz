@@ -8,44 +8,48 @@
 import SwiftUI
 
 struct WelcomeView: View {
-    @State private var navigateToAppSelection = false
-    
+    @State private var navigateToPermissions = false
+
     var body: some View {
         ZStack {
             Color.black
                 .ignoresSafeArea()
-            
+
             VStack(spacing: 0) {
-                Spacer()
-                
-                Text("привіт! це ScreenoRiz, застосунок для боротьби з надмірним часом у соцмережах. кожна зайва хвилина — донат на суспільне благо.")
-                    .font(.title3)
-                    .foregroundStyle(.white)
-                    .multilineTextAlignment(.center)
+                // Illustration
+                Image("illus-welcome-screen")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity)
                     .padding(.horizontal, 32)
-                
+                    .padding(.top, 120)
+
+                // Description Text
+                Text("ScreenoRiz – застосунок, що рахує кожна надмірну хвилину екранного часу як донат на суспільне благо.")
+                    .font(.ktfTitleLarge)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 32)
+                    .padding(.top, 40)
+
                 Spacer()
-                
+
+                // Start Button
                 Button {
-                    navigateToAppSelection = true
+                    navigateToPermissions = true
                 } label: {
-                    Text("почніmo")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(.white, lineWidth: 2)
-                        )
+                    Text("почнімо")
+                        .font(.ktfTitle)
+                        .foregroundStyle(.black)
+                        .frame(maxWidth: .infinity, minHeight: 72)
+                        .background(Capsule().fill(.white))
                 }
                 .padding(.horizontal, 32)
-                .padding(.bottom, 40)
             }
         }
-        .navigationBarBackButtonHidden()
-        .navigationDestination(isPresented: $navigateToAppSelection) {
-            AppSelectionView()
+        .navigationBarBackButtonHidden(true)
+        .navigationDestination(isPresented: $navigateToPermissions) {
+            ScreenTimePermissionView()
         }
     }
 }

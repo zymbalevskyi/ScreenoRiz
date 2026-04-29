@@ -8,88 +8,107 @@
 import SwiftUI
 
 struct RateSelectionView: View {
+    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var appState: AppState
-    @State private var ratePerMinute: Double = 1.0
+    private let rates: [Double] = [0.5, 1, 2, 3, 4, 5]
+    @State private var selectedRate: Double = 1
     @State private var navigateToInfo = false
-    
+    @Namespace private var pillNamespace
+
+    private func rateLabel(_ rate: Double, active: Bool = false) -> String {
+        let num = rate.truncatingRemainder(dividingBy: 1) == 0
+            ? "\(Int(rate))"
+            : String(format: "%.1f", rate)
+        return active ? "\(num)₴" : num
+    }
+
     var body: some View {
         ZStack {
-            Color.black
-                .ignoresSafeArea()
-            
-            VStack(spacing: 24) {
+            Color.black.ignoresSafeArea()
+
+            VStack(alignment: .leading, spacing: 0) {
+                NavBar(onBack: { dismiss() })
+
+                // Title + subtitle
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("обери тариф")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
+                    Text("обрати \"тариф\"")
+                        .font(.ktfTitleLarge)
                         .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    Text("встанови денний ліміт часу, перевищення якого буде рахувати суму донату")
-                        .font(.subheadline)
-                        .foregroundStyle(.gray)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    Text("встанови скільки коштуватиме кожна хвилина понад лімітом")
+                        .font(.ktfBody)
+                        .foregroundStyle(.white.opacity(0.55))
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-                .padding(.horizontal, 32)
-                .padding(.top, 20)
-                
-                Spacer()
-                
+                .padding(.top, 24)
+
                 // Rate card
                 VStack(spacing: 16) {
-                    Text("1хв = \(Int(ratePerMinute))₴")
-                        .font(.system(size: 48, weight: .bold))
+                    Text("1 хвилина дорівнює")
+                        .font(.ktfTitleSmall)
                         .foregroundStyle(.white)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 40)
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(.white, lineWidth: 2)
-                )
-                .padding(.horizontal, 32)
-                
-                // Slider
-                VStack(spacing: 8) {
-                    Slider(value: $ratePerMinute, in: 1...10, step: 1)
-                        .tint(.white)
-                        .padding(.horizontal, 32)
-                    
-                    HStack {
-                        Text("1₴")
-                            .foregroundStyle(.gray)
-                            .font(.caption)
-                        Spacer()
-                        Text("10₴")
-                            .foregroundStyle(.gray)
-                            .font(.caption)
+
+                    // Pill selector with sliding animation
+                    HStack(spacing: 4) {
+                        ForEach(rates, id: \.self) { rate in
+                            Button {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
+                                    selectedRate = rate
+                                }
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            } label: {
+                                Text(rateLabel(rate, active: rate == selectedRate))
+                                    .font(.ktfBody)
+                                    .foregroundStyle(.white.opacity(rate == selectedRate ? 1 : 0.45))
+                                    .frame(maxWidth: .infinity, minHeight: 44)
+                                    .background {
+                                        if rate == selectedRate {
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .fill(Color(hex: "5E5E5E"))
+                                                .matchedGeometryEffect(id: "pill", in: pillNamespace)
+                                        }
+                                    }
+                            }
+                            .buttonStyle(.plain)
+                        }
                     }
-                    .padding(.horizontal, 40)
+                    .padding(4)
+                    .background(RoundedRectangle(cornerRadius: 14).fill(Color(hex: "292929")))
                 }
-                
+                .padding(.horizontal, 16)
+                .padding(.vertical, 20)
+                .frame(maxWidth: .infinity)
+                .background(RoundedRectangle(cornerRadius: 16).fill(Color(hex: "121212")))
+                .padding(.top, 28)
+
                 Spacer()
-                
-                Button {
-                    appState.ratePerMinute = Int(ratePerMinute)
-                    navigateToInfo = true
-                } label: {
-                    Text("продовжити")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(.white, lineWidth: 2)
-                        )
+
+                // Hint + Continue button
+                VStack(spacing: 16) {
+                    Text("ти завжди зможеш змінити вибір")
+                        .font(.ktfCaption)
+                        .foregroundStyle(.white.opacity(0.35))
+
+                    Button {
+                        appState.ratePerMinute = selectedRate
+                        navigateToInfo = true
+                    } label: {
+                        Text("продовжити")
+                            .font(.ktfTitle)
+                            .foregroundStyle(.black)
+                            .frame(maxWidth: .infinity, minHeight: 72)
+                            .background(Capsule().fill(.white))
+                    }
                 }
-                .padding(.horizontal, 32)
-                .padding(.bottom, 40)
             }
+            .padding(.horizontal, 32)
         }
         .navigationBarBackButtonHidden()
         .navigationDestination(isPresented: $navigateToInfo) {
             InfoView()
+        }
+        .onAppear {
+            selectedRate = appState.ratePerMinute
         }
     }
 }
