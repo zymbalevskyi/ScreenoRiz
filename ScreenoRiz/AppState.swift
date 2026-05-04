@@ -19,7 +19,17 @@ extension DeviceActivityName {
 class AppState: ObservableObject {
 
     @Published var hasCompletedOnboarding: Bool {
-        didSet { UserDefaults.standard.set(hasCompletedOnboarding, forKey: "hasCompletedOnboarding") }
+        didSet {
+            UserDefaults.standard.set(hasCompletedOnboarding, forKey: "hasCompletedOnboarding")
+            if hasCompletedOnboarding && UserDefaults.standard.object(forKey: "firstUsedDate") == nil {
+                UserDefaults.standard.set(Calendar.current.startOfDay(for: Date()), forKey: "firstUsedDate")
+            }
+        }
+    }
+
+    var firstUsedDate: Date {
+        UserDefaults.standard.object(forKey: "firstUsedDate") as? Date
+            ?? Calendar.current.startOfDay(for: Date())
     }
 
     @Published var activitySelection: FamilyActivitySelection {
@@ -60,6 +70,10 @@ class AppState: ObservableObject {
 
     init() {
         self.hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
+        if UserDefaults.standard.bool(forKey: "hasCompletedOnboarding"),
+           UserDefaults.standard.object(forKey: "firstUsedDate") == nil {
+            UserDefaults.standard.set(Calendar.current.startOfDay(for: Date()), forKey: "firstUsedDate")
+        }
         self.ratePerMinute = UserDefaults.standard.object(forKey: "ratePerMinute") as? Double ?? 1.0
 
         if let data = UserDefaults.standard.data(forKey: "appLimits"),
@@ -91,21 +105,51 @@ class AppState: ObservableObject {
     /// Rendered app name cache (tokenKey → name, with "X" already replaced by "X (Twitter)")
     @Published var tokenDisplayNames: [String: String] = [:]
 
-    /// Renders each selected app's label off-screen via UIKit to extract the display name string.
-    /// Must be called on the main thread.
+    /// Renders each selected app's label in the live key window (off-screen) to extract the display name.
+    /// FamilyControls requires a real window hierarchy to resolve token names.
     @MainActor
     func resolveDisplayNames() {
-        for token in activitySelection.applicationTokens {
-            let key = tokenKey(token)
-            guard tokenDisplayNames[key] == nil else { continue }
+        let newTokens = activitySelection.applicationTokens.filter {
+            tokenDisplayNames[tokenKey($0)] == nil
+        }
+        guard !newTokens.isEmpty else { return }
 
-            let vc = UIHostingController(rootView: Label(token).labelStyle(.titleOnly))
-            vc.view.frame = CGRect(x: 0, y: 0, width: 300, height: 60)
-            vc.view.layoutIfNeeded()
-
-            if let name = extractText(from: vc.view), !name.isEmpty {
-                tokenDisplayNames[key] = (name == "X") ? "X (Twitter)" : name
+        guard let window = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .flatMap({ $0.windows })
+            .first(where: { $0.isKeyWindow }) else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+                self?.resolveDisplayNames()
             }
+            return
+        }
+
+        // retainedVCs keeps UIHostingControllers alive until extraction completes.
+        // Without this, the VC is deallocated immediately after the loop because only
+        // vc.view is stored — UIView holds only a weak back-reference to its VC.
+        var retainedVCs: [UIViewController] = []
+        var pending: [(view: UIView, key: String)] = []
+
+        for token in newTokens {
+            let key = tokenKey(token)
+            let vc = UIHostingController(rootView: Label(token).labelStyle(.titleOnly))
+            vc.view.frame = CGRect(x: -3000, y: 0, width: 300, height: 60)
+            vc.view.backgroundColor = .clear
+            window.addSubview(vc.view)
+            retainedVCs.append(vc)
+            pending.append((view: vc.view, key: key))
+        }
+
+        // 300 ms gives FamilyControls enough time to resolve token → display name.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            for pair in pending {
+                pair.view.layoutIfNeeded()
+                if let self, let name = self.extractText(from: pair.view), !name.isEmpty {
+                    self.tokenDisplayNames[pair.key] = (name == "X") ? "X (Twitter)" : name
+                }
+                pair.view.removeFromSuperview()
+            }
+            _ = retainedVCs  // Release VCs only after all views are cleaned up
         }
     }
 
@@ -116,7 +160,16 @@ class AppState: ObservableObject {
         for sub in view.subviews {
             if let text = extractText(from: sub) { return text }
         }
-        return view.accessibilityLabel.flatMap { $0.isEmpty ? nil : $0 }
+        // SwiftUI Text may expose its content via accessibility elements rather than UILabel.
+        if let elements = view.accessibilityElements {
+            for el in elements {
+                if let acc = (el as? NSObject)?.accessibilityLabel, !acc.isEmpty {
+                    return acc
+                }
+            }
+        }
+        if let acc = view.accessibilityLabel, !acc.isEmpty { return acc }
+        return nil
     }
 
     // MARK: - Per-app limit helpers
@@ -217,6 +270,9 @@ class AppState: ObservableObject {
     func startMonitoring() {
         let center = DeviceActivityCenter()
         center.stopMonitoring([.daily])
+        // Clear stale shields so a newly raised limit (or day change) takes effect
+        // immediately. The monitor extension re-applies shields as apps hit their thresholds.
+        ManagedSettingsStore().shield.applications = nil
         guard !activitySelection.applicationTokens.isEmpty else { return }
 
         let schedule = DeviceActivitySchedule(

@@ -80,6 +80,7 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
         super.intervalDidStart(for: activity)
         guard activity == .daily else { return }
         SharedDefaults.resetIfNewDay()
+        store.shield.applications = nil
         logger.info("Daily interval started, state reset if new day.")
     }
 

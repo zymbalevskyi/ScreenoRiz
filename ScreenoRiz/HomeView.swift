@@ -9,19 +9,70 @@ import FamilyControls
 import ManagedSettings
 import DeviceActivity
 
+// MARK: - Screen Time Severity
+
+private enum ScreenTimeSeverity: Equatable {
+    case none, low, medium, high
+
+    init(minutes: Int) {
+        switch minutes {
+        case 0: self = .none
+        case 1..<90: self = .low
+        case 90..<240: self = .medium
+        default: self = .high
+        }
+    }
+
+    var activeDots: Int {
+        switch self {
+        case .none: return 0
+        case .low: return 1
+        case .medium: return 2
+        case .high: return 3
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .none: return .white.opacity(0.4)
+        case .low: return Color(hex: "24835B")
+        case .medium: return Color(hex: "F5A623")
+        case .high: return Color(hex: "E94200")
+        }
+    }
+}
+
+private struct SeverityDots: View {
+    let severity: ScreenTimeSeverity
+    var dotSize: CGFloat = 5
+    var noneColor: Color = Color(hex: "292929")
+
+    var body: some View {
+        HStack(spacing: 3) {
+            ForEach(0..<3, id: \.self) { i in
+                Circle()
+                    .fill(
+                        severity == .none
+                            ? noneColor
+                            : (i < severity.activeDots ? severity.color : Color.white.opacity(0.15))
+                    )
+                    .frame(width: dotSize, height: dotSize)
+            }
+        }
+    }
+}
+
 // MARK: - Home
 
 struct HomeView: View {
     @EnvironmentObject var appState: AppState
-    @State private var currentDate: Date = Date()
-    @State private var period: Period = .day
+    @State private var currentDate: Date = Calendar.current.startOfDay(for: Date())
     @State private var showSettings = false
-    @State private var showCharities = false
     @State private var showAddApp = false
     @State private var detailItem: AppDetailItem?
     @State private var isRefreshing: Bool = false
-
-    enum Period { case day, week }
+    @State private var isSheetExpanded: Bool = false
+    @State private var sheetDragOffset: CGFloat = 0
 
     private var sortedTokens: [(key: String, token: ApplicationToken)] {
         appState.activitySelection.applicationTokens
@@ -29,109 +80,111 @@ struct HomeView: View {
             .sorted { $0.key < $1.key }
     }
 
+    // MARK: - Week helpers
+
+    private var currentWeekDays: [Date] {
+        var cal = Calendar(identifier: .gregorian)
+        cal.firstWeekday = 2
+        let today = cal.startOfDay(for: Date())
+        let weekday = cal.component(.weekday, from: today)
+        let daysToMonday = weekday == 1 ? 6 : weekday - 2
+        guard let monday = cal.date(byAdding: .day, value: -daysToMonday, to: today) else { return [] }
+        return (0..<7).compactMap { cal.date(byAdding: .day, value: $0, to: monday) }
+    }
+
+    private static let weekdayLabels = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд"]
+
+    private func severityFor(_ date: Date) -> ScreenTimeSeverity {
+        ScreenTimeSeverity(minutes: appState.getTotalMinutes(on: date))
+    }
+
+    private var isBeforeFirstUse: Bool {
+        let cal = Calendar.current
+        return cal.startOfDay(for: currentDate) < cal.startOfDay(for: appState.firstUsedDate)
+    }
+
+    // MARK: - Body
+
     var body: some View {
         Color.black.ignoresSafeArea()
             .overlay {
                 VStack(spacing: 0) {
                     topBar
-                        .padding(.horizontal, 20)
-                        .padding(.top, 16)
+                        .padding(.horizontal, 16)
+                        .padding(.top, 4)
                         .padding(.bottom, 16)
 
-                    ScrollView {
-                        VStack(spacing: 0) {
-                            // UIKit bridge — transparent UIRefreshControl for gesture detection
-                            UIKitRefreshControl(isRefreshing: $isRefreshing) {
-                                appState.objectWillChange.send()
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                                    isRefreshing = false
+                    weekCalendarStrip
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 20)
+
+                    if isBeforeFirstUse {
+                        noDataView
+                    } else {
+                        ScrollView {
+                            VStack(spacing: 0) {
+                                UIKitRefreshControl(isRefreshing: $isRefreshing) {
+                                    appState.objectWillChange.send()
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                                        isRefreshing = false
+                                    }
                                 }
-                            }
-                            .frame(width: 0, height: 0)
+                                .frame(width: 0, height: 0)
 
-                            // Custom indicator visible while refreshing
-                            if isRefreshing {
-                                ThreeBallsTriangle(color: Color(hex: "E94200"), size: 32)
-                                    .frame(height: 50)
-                                    .frame(maxWidth: .infinity)
-                                    .transition(.opacity.combined(with: .scale(scale: 0.8)))
-                            }
+                                if isRefreshing {
+                                    ThreeBallsTriangle(color: Color(hex: "E94200"), size: 32)
+                                        .frame(height: 50)
+                                        .frame(maxWidth: .infinity)
+                                        .transition(.opacity.combined(with: .scale(scale: 0.8)))
+                                }
 
-                            appsGrid
-                                .padding(.horizontal, 16)
-                                .padding(.bottom, 220)
+                                VStack(spacing: 8) {
+                                    screenTimeSummary
+                                        .padding(.horizontal, 16)
+
+                                    appsGrid2Col
+                                        .padding(.horizontal, 16)
+                                }
+                                .padding(.bottom, 200)
+                            }
                         }
                     }
                 }
-                .overlay(alignment: .bottom) {
-                    VStack(spacing: 0) {
-                        periodToggle
-                            .padding(.horizontal, 16)
-                            .padding(.bottom, 16)
-                        bottomSection
-                    }
+            }
+            .overlay(alignment: .bottom) {
+                expandableBottomSheet
                     .ignoresSafeArea(edges: .bottom)
+            }
+            .task { appState.resolveDisplayNames() }
+            .sheet(isPresented: $showSettings) {
+                SettingsSheet(showAddApp: $showAddApp)
+                    .environmentObject(appState)
+            }
+            .sheet(isPresented: $showAddApp) {
+                NavigationStack {
+                    FamilyActivityPicker(selection: $appState.activitySelection)
+                        .toolbar {
+                            ToolbarItem(placement: .confirmationAction) {
+                                Button("готово") { showAddApp = false }
+                            }
+                        }
                 }
             }
-        .sheet(isPresented: $showSettings) {
-            SettingsSheet(showAddApp: $showAddApp)
-                .environmentObject(appState)
-        }
-        .sheet(isPresented: $showAddApp) {
-            NavigationStack {
-                FamilyActivityPicker(selection: $appState.activitySelection)
-                    .toolbar {
-                        ToolbarItem(placement: .confirmationAction) {
-                            Button("готово") { showAddApp = false }
-                        }
-                    }
+            .sheet(item: $detailItem) { detail in
+                AppDetailSheet(item: detail, currentDate: currentDate)
+                    .environmentObject(appState)
             }
-        }
-        .sheet(isPresented: $showCharities) {
-            CharitiesView(donationAmount: charitiesAmount)
-        }
-        .sheet(item: $detailItem) { detail in
-            AppDetailSheet(item: detail, currentDate: currentDate)
-                .environmentObject(appState)
-        }
     }
 
-    // MARK: Top bar (logo + date nav + settings)
+    // MARK: - Top bar
 
     private var topBar: some View {
-        HStack(spacing: 0) {
-            Image("illus-knife")
+        HStack {
+            Image("header-logo")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 24, height: 24)
-                .frame(width: 44, height: 44)
-
+                .frame(height: 22)
             Spacer()
-
-            HStack(spacing: 4) {
-                Button { changeDate(by: period == .week ? -7 : -1) } label: {
-                    Image("icon-arrow-left")
-                        .resizable().frame(width: 14, height: 14)
-                        .foregroundStyle(.white.opacity(0.6))
-                        .frame(width: 28, height: 28)
-                }
-
-                Text(dateText)
-                    .font(.ktfBody)
-                    .foregroundStyle(.white.opacity(0.8))
-                    .textCase(.uppercase)
-                    .fixedSize()
-
-                Button { changeDate(by: period == .week ? 7 : 1) } label: {
-                    Image("icon-arrow-right")
-                        .resizable().frame(width: 14, height: 14)
-                        .foregroundStyle(.white.opacity(0.6))
-                        .frame(width: 28, height: 28)
-                }
-            }
-
-            Spacer()
-
             Button { showSettings = true } label: {
                 Image("icon-gear")
                     .resizable()
@@ -144,60 +197,269 @@ struct HomeView: View {
         }
     }
 
-    // MARK: Apps grid
+    // MARK: - Week calendar strip
 
-    private var appsGrid: some View {
-        VStack(spacing: 8) {
-            totalScreenTimeCard
+    private var weekCalendarStrip: some View {
+        HStack(spacing: 0) {
+            ForEach(Array(currentWeekDays.enumerated()), id: \.offset) { index, day in
+                let cal = Calendar.current
+                let isToday = cal.isDateInToday(day)
+                let isSelected = cal.isDate(day, inSameDayAs: currentDate)
+                let isFuture = day > cal.startOfDay(for: Date())
+                let dayNum = cal.component(.day, from: day)
+                let label = Self.weekdayLabels[index]
+                let severity = severityFor(day)
 
-            ForEach(sortedTokens, id: \.key) { item in
-                AppGridCard(
-                    tokenKey: item.key,
-                    token: item.token,
-                    date: currentDate,
-                    period: period
-                )
-                .contentShape(RoundedRectangle(cornerRadius: 16))
-                .onTapGesture {
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                    detailItem = AppDetailItem(id: item.key, token: item.token)
+                Button {
+                    currentDate = day
+                } label: {
+                    VStack(spacing: 0) {
+                        Text(label)
+                            .font(.ktfCaptionSmall)
+                            .foregroundStyle(
+                                severity == .none
+                                    ? (isToday ? .white : Color(hex: "5E5E5E"))
+                                    : severity.color
+                            )
+                            .frame(height: 18)
+
+                        Text("\(dayNum)")
+                            .font(.ktfBody)
+                            .foregroundStyle(severity == .none ? Color.white.opacity(0.28) : severity.color)
+                            .frame(width: 32, height: 32)
+
+                        SeverityDots(severity: severity, dotSize: 5,
+                                     noneColor: isFuture ? Color(hex: "191919") : Color(hex: "292929"))
+                    }
+                    .padding(.vertical, 4)
+                    .frame(maxWidth: .infinity)
+                    .background {
+                        if isSelected || isToday {
+                            RoundedRectangle(cornerRadius: 5)
+                                .fill(isToday ? Color(hex: "191919") : Color.clear)
+                                .overlay {
+                                    if isSelected {
+                                        RoundedRectangle(cornerRadius: 5)
+                                            .stroke(Color(hex: "292929"), lineWidth: 1.5)
+                                    }
+                                }
+                                .padding(.horizontal, 2.5)
+                        }
+                    }
                 }
+                .buttonStyle(.plain)
             }
-
-            addAppCell
         }
     }
 
-    private var totalScreenTimeCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Загальний екранний час")
-                .font(.ktfBody)
-                .foregroundStyle(.white)
-            HStack(alignment: .firstTextBaseline) {
-                Text(fmtMinutes(totalMinutes))
+    // MARK: - Screen time summary
+
+    private var screenTimeSummary: some View {
+        let mins = totalMinutes
+        let severity = ScreenTimeSeverity(minutes: mins)
+        let pct = mins > 0 ? min(100, mins * 100 / 960) : 0
+
+        return VStack(alignment: .leading, spacing: 20) {
+            Text("ЗАГАЛЬНИЙ ЕКРАННИЙ ЧАС")
+                .font(.ktfCaption)
+                .foregroundStyle(.white.opacity(0.8))
+
+            HStack(alignment: .center) {
+                Text(fmtMinutes(mins))
                     .font(.ktfTitle)
                     .foregroundStyle(.white)
                 Spacer()
-                Text("\(min(100, totalMinutes * 100 / 1440))% дня")
-                    .font(.ktfBody)
-                    .foregroundStyle(.white)
+                if mins > 0 {
+                    HStack(spacing: 6) {
+                        SeverityDots(severity: severity, dotSize: 6)
+                        Text("\(pct)% дня")
+                            .font(.ktfBody)
+                            .foregroundStyle(severity.color)
+                    }
+                }
             }
         }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
-        .background(RoundedRectangle(cornerRadius: 16).fill(Color(hex: "121212")))
+        .background(RoundedRectangle(cornerRadius: 6).fill(Color(hex: "121212")))
     }
 
-    private var totalMinutes: Int {
-        if period == .day {
-            return appState.getTotalMinutes(on: currentDate)
+    // MARK: - 2-column app grid
+
+    private var appsGrid2Col: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("ОБМЕЖЕНІ АПКИ")
+                .font(.ktfCaption)
+                .foregroundStyle(.white.opacity(0.8))
+
+            LazyVGrid(
+                columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)],
+                spacing: 8
+            ) {
+                ForEach(sortedTokens, id: \.key) { item in
+                    AppGridCard2Col(
+                        tokenKey: item.key,
+                        token: item.token,
+                        date: currentDate
+                    )
+                    .contentShape(RoundedRectangle(cornerRadius: 4))
+                    .onTapGesture {
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        detailItem = AppDetailItem(id: item.key, token: item.token)
+                    }
+                }
+            }
         }
-        let calendar = Calendar.current
-        guard let weekStart = calendar.dateInterval(of: .weekOfYear, for: currentDate)?.start else { return 0 }
-        return (0..<7)
-            .compactMap { calendar.date(byAdding: .day, value: $0, to: weekStart) }
-            .map { appState.getTotalMinutes(on: $0) }
-            .reduce(0, +)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(RoundedRectangle(cornerRadius: 6).fill(Color(hex: "121212")))
+    }
+
+    // MARK: - Expandable Bottom Sheet
+
+    private let sheetCollapsedHeight: CGFloat = 140
+    private var sheetExpandedHeight: CGFloat { UIScreen.main.bounds.height * 0.88 }
+    private var sheetTravel: CGFloat { sheetExpandedHeight - sheetCollapsedHeight }
+    private var sheetOffset: CGFloat {
+        let base: CGFloat = isSheetExpanded ? 0 : sheetTravel
+        return max(0, min(sheetTravel, base + sheetDragOffset))
+    }
+
+    private var sheetDragGesture: some Gesture {
+        DragGesture(minimumDistance: 8)
+            .onChanged { value in sheetDragOffset = value.translation.height }
+            .onEnded { value in
+                let t = value.translation.height
+                let predicted = value.predictedEndTranslation.height
+                withAnimation(.spring(response: 0.42, dampingFraction: 0.82)) {
+                    if isSheetExpanded {
+                        if t > 60 || predicted > 120 { isSheetExpanded = false }
+                    } else {
+                        if t < -60 || predicted < -120 { isSheetExpanded = true }
+                    }
+                    sheetDragOffset = 0
+                }
+            }
+    }
+
+    @ViewBuilder
+    private var expandableBottomSheet: some View {
+        let sheetShape = UnevenRoundedRectangle(
+            topLeadingRadius: 34, bottomLeadingRadius: 0,
+            bottomTrailingRadius: 0, topTrailingRadius: 34
+        )
+
+        VStack(spacing: 0) {
+            // ── Draggable header — fixed height pins the ScrollView below the
+            //    collapsed fold so charity cards never peek into collapsed state.
+            VStack(spacing: 0) {
+                Capsule()
+                    .fill(Color.white.opacity(0.2))
+                    .frame(width: 36, height: 4)
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 12)
+
+                HStack(alignment: .top, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("сума донату")
+                            .font(.ktfTitle)
+                            .foregroundStyle(.white.opacity(0.9))
+                        Text("можете і більше, звісно")
+                            .font(.ktfCaption)
+                            .foregroundStyle(.white.opacity(0.4))
+                    }
+                    Spacer()
+                    Text(charitiesAmount)
+                        .font(.custom("KTFPrima-Light", size: 20))
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 20)
+                .padding(.bottom, 16)
+
+                // Tappable text-divider row — replaces the old button
+                Button {
+                    withAnimation(.spring(response: 0.42, dampingFraction: 0.82)) {
+                        isSheetExpanded.toggle()
+                    }
+                } label: {
+                    HStack(spacing: 12) {
+                        Rectangle()
+                            .fill(Color.white.opacity(0.12))
+                            .frame(height: 1)
+                        Text("куди задонатити ?")
+                            .font(.ktfCaption)
+                            .foregroundStyle(.white.opacity(0.35))
+                            .fixedSize()
+                        Rectangle()
+                            .fill(Color.white.opacity(0.12))
+                            .frame(height: 1)
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 12)
+                }
+                .buttonStyle(.plain)
+            }
+            .frame(height: sheetCollapsedHeight, alignment: .top)
+            .clipped()
+            .highPriorityGesture(sheetDragGesture)
+
+            // ── Charity cards ─────────────────────────────────────────────
+            ScrollView {
+                VStack(spacing: 12) {
+                    ForEach(Charity.all) { jar in JarCard(jar: jar) }
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 4)
+                .padding(.bottom, 40)
+            }
+            .scrollDisabled(!isSheetExpanded)
+            .opacity(isSheetExpanded ? 1 : 0)
+            .animation(.spring(response: 0.42, dampingFraction: 0.82), value: isSheetExpanded)
+        }
+        .frame(height: sheetExpandedHeight)
+        .background {
+            if #available(iOS 26.0, *) {
+                Color.clear
+                    .glassEffect(.regular.interactive(), in: sheetShape)
+                    .ignoresSafeArea(edges: .bottom)
+            } else {
+                sheetShape
+                    .fill(Color(hex: "292929"))
+                    .ignoresSafeArea(edges: .bottom)
+            }
+        }
+        .offset(y: sheetOffset)
+    }
+
+    // MARK: - No-data state
+
+    private var noDataView: some View {
+        VStack {
+            Spacer()
+            VStack(spacing: 16) {
+                Image("nodata-illustration")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: 303)
+                Text("у цей день ми\nще не збирали данні")
+                    .font(.ktfTitle)
+                    .foregroundStyle(.white.opacity(0.8))
+                    .multilineTextAlignment(.center)
+            }
+            Spacer()
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.bottom, sheetCollapsedHeight)
+    }
+
+    // MARK: - Helpers
+
+    private var totalMinutes: Int {
+        appState.getTotalMinutes(on: currentDate)
     }
 
     private func fmtMinutes(_ minutes: Int) -> String {
@@ -207,181 +469,29 @@ struct HomeView: View {
         return m == 0 ? "\(h)г" : "\(h)г \(m)хв"
     }
 
-    private var addAppCell: some View {
-        Button { showAddApp = true } label: {
-            HStack(spacing: 12) {
-                Image("icon-add-app")
-                    .renderingMode(.template)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 24, height: 24)
-                    .foregroundStyle(.white.opacity(0.5))
-                Text("додати застосунок")
-                    .font(.ktfBody)
-                    .foregroundStyle(.white)
-            }
-            .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
-            .padding(.horizontal, 16)
-            .background(RoundedRectangle(cornerRadius: 16).fill(Color(hex: "121212")))
-        }
-    }
-
-    // MARK: Bottom section (fixed)
-
-    private let sectionShape = UnevenRoundedRectangle(
-        topLeadingRadius: 34, bottomLeadingRadius: 0,
-        bottomTrailingRadius: 0, topTrailingRadius: 34
-    )
-
-    @ViewBuilder
-    private var bottomSection: some View {
-        if #available(iOS 26.0, *) {
-            donationCard
-                .background {
-                    Color.clear
-                        .glassEffect(.regular.interactive(), in: sectionShape)
-                        .ignoresSafeArea(edges: .bottom)
-                }
-        } else {
-            donationCard
-                .background {
-                    sectionShape
-                        .fill(Color(hex: "292929"))
-                        .ignoresSafeArea(edges: .bottom)
-                }
-        }
-    }
-
-    private var periodToggle: some View {
-        HStack(spacing: 0) {
-            periodOption("день", isSelected: period == .day) { period = .day }
-            periodOption("тиждень", isSelected: period == .week) { period = .week }
-        }
-        .padding(4)
-        .background {
-            ZStack {
-                RoundedRectangle(cornerRadius: 16).fill(.ultraThinMaterial)
-                RoundedRectangle(cornerRadius: 16).fill(Color(hex: "121212").opacity(0.88))
-            }
-            .environment(\.colorScheme, .dark)
-        }
-    }
-
-    private func periodOption(_ label: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(label)
-                .font(.ktfBody)
-                .foregroundStyle(isSelected ? .white : .white.opacity(0.4))
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-                .background {
-                    if isSelected {
-                        // Concentric radius: outer 16 − padding 4 = 12
-                        RoundedRectangle(cornerRadius: 12).fill(Color(hex: "292929"))
-                    }
-                }
-        }
-    }
-
     private var charitiesAmount: String {
-        let amount: Double = period == .day
-            ? appState.getTotalDonation(for: currentDate)
-            : appState.getWeeklyDebt(for: currentDate)
+        let amount = appState.getWeeklyDebt(for: currentDate)
         return amount.truncatingRemainder(dividingBy: 1) == 0
             ? "\(Int(amount)) ₴"
             : String(format: "%.1f ₴", amount)
     }
-
-    private var donationCard: some View {
-        return VStack(alignment: .leading, spacing: 0) {
-            HStack(alignment: .top, spacing: 8) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("сума донату")
-                        .font(.ktfTitle)
-                        .foregroundStyle(.white.opacity(0.9))
-                    Text("можете і більше, звісно")
-                        .font(.ktfCaption)
-                        .foregroundStyle(.white.opacity(0.4))
-                }
-                Spacer()
-                Text(charitiesAmount)
-                    .font(.custom("KTFPrima-Light", size: 20))
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-            }
-            .padding(.horizontal, 20)
-            .padding(.top, 20)
-            .padding(.bottom, 24)
-
-            Button { showCharities = true } label: {
-                Text("переглянути фонди та збори")
-                    .font(.ktfBody)
-                    .foregroundStyle(.white.opacity(0.7))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(RoundedRectangle(cornerRadius: 100).fill(Color(hex: "292929")))
-            }
-            .padding(.horizontal, 18)
-        }
-    }
-
-    // MARK: Helpers
-
-    private static let monthAbbreviations: [Int: String] = [
-        1: "січ.", 2: "лют.", 3: "берез.", 4: "квіт.",
-        5: "трав.", 6: "черв.", 7: "лип.", 8: "серп.",
-        9: "верес.", 10: "жовт.", 11: "листоп.", 12: "груд."
-    ]
-
-    private static func shortDate(_ date: Date) -> String {
-        let cal = Calendar.current
-        let day = cal.component(.day, from: date)
-        let month = cal.component(.month, from: date)
-        return "\(day) \(monthAbbreviations[month] ?? "")"
-    }
-
-    private var dateText: String {
-        if period == .week {
-            let calendar = Calendar.current
-            guard let weekStart = calendar.dateInterval(of: .weekOfYear, for: currentDate)?.start,
-                  let weekEnd = calendar.date(byAdding: .day, value: 6, to: weekStart) else {
-                return Self.shortDate(currentDate)
-            }
-            return "\(Self.shortDate(weekStart)) – \(Self.shortDate(weekEnd))"
-        }
-        return Calendar.current.isDateInToday(currentDate)
-            ? "сьогодні"
-            : Self.shortDate(currentDate)
-    }
-
-    private func changeDate(by days: Int) {
-        guard let newDate = Calendar.current.date(byAdding: .day, value: days, to: currentDate) else { return }
-        let today = Calendar.current.startOfDay(for: Date())
-        if Calendar.current.startOfDay(for: newDate) <= today {
-            currentDate = newDate
-        }
-    }
 }
 
-// MARK: - App Grid Card
+// MARK: - 2-Column App Grid Card
 
-struct AppGridCard: View {
+struct AppGridCard2Col: View {
     @EnvironmentObject var appState: AppState
     let tokenKey: String
     let token: ApplicationToken
     let date: Date
-    let period: HomeView.Period
+
+    @State private var showTimeSplit: Bool = false
 
     private var limitMinutes: Int { appState.appLimits[tokenKey] ?? 15 }
+    private var effectiveLimit: Int { limitMinutes }
 
     private var usedMinutes: Int {
-        period == .day
-            ? appState.getMinutes(forTokenKey: tokenKey, on: date)
-            : weekAggregate { appState.getMinutes(forTokenKey: tokenKey, on: $0) }
-    }
-
-    private var effectiveLimit: Int {
-        period == .day ? limitMinutes : limitMinutes * 7
+        appState.getMinutes(forTokenKey: tokenKey, on: date)
     }
 
     private var overLimit: Bool { usedMinutes >= effectiveLimit }
@@ -397,31 +507,49 @@ struct AppGridCard: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack(alignment: .center, spacing: 12) {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(alignment: .top, spacing: 8) {
+                Group {
+                    if let name = appState.tokenDisplayNames[tokenKey], !name.isEmpty {
+                        Text(name)
+                    } else {
+                        Label(token).labelStyle(.titleOnly)
+                    }
+                }
+                .font(.ktfTitleSmall)
+                .foregroundStyle(.white)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+
+                Spacer(minLength: 4)
+
                 Label(token)
-                    .labelStyle(AppCardLabelStyle())
-                Spacer()
-                Text(timeSummary)
-                    .font(.ktfBody)
-                    .foregroundStyle(overLimit ? Color(hex: "E94200") : Color(hex: "24835B"))
+                    .labelStyle(.iconOnly)
+                    .frame(width: 28, height: 28)
+                    .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+            }
+
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, minHeight: 150, alignment: .topLeading)
+        .overlay(alignment: .bottomLeading) {
+            HStack(alignment: .center) {
+                Text(bottomText)
+                    .font(.ktfCaption)
+                    .foregroundStyle(appDebt > 0 ? Color(hex: "E94200") : Color(hex: "24835B"))
+                    .lineLimit(1)
+                    .onTapGesture {
+                        if appDebt > 0 {
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            showTimeSplit.toggle()
+                        }
+                    }
+                Spacer(minLength: 4)
                 progressIndicator
             }
-            .padding(.horizontal, 16)
-            .frame(minHeight: 56)
-
-            if appDebt > 0 {
-                Text(appDebt.truncatingRemainder(dividingBy: 1) == 0
-                    ? "\(Int(appDebt)) ₴ донату"
-                    : String(format: "%.1f ₴ донату", appDebt))
-                    .font(.ktfBody)
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity, minHeight: 32, maxHeight: 32)
-                    .background(Color(hex: "292929"))
-            }
+            .padding(12)
         }
-        .background(RoundedRectangle(cornerRadius: 16).fill(Color(hex: "121212")))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .background(RoundedRectangle(cornerRadius: 16).fill(Color(hex: "1C1C1E")))
     }
 
     @ViewBuilder
@@ -432,20 +560,32 @@ struct AppGridCard: View {
                 Image("icon-screentime")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 20, height: 20)
+                    .frame(width: 16, height: 16)
             }
-            .frame(width: 32, height: 32)
+            .frame(width: 28, height: 28)
         } else if usedMinutes > 0 {
             ZStack {
                 Circle().fill(Color(hex: "24835B").opacity(0.25))
                 PieShape(progress: pieProgress).fill(Color(hex: "24835B"))
             }
-            .frame(width: 32, height: 32)
+            .frame(width: 28, height: 28)
         } else {
             Circle()
                 .fill(Color(hex: "292929"))
-                .frame(width: 32, height: 32)
+                .frame(width: 28, height: 28)
         }
+    }
+
+    private var bottomText: String {
+        if appDebt > 0 {
+            if showTimeSplit {
+                return "\(fmt(usedMinutes)) / \(fmt(effectiveLimit))"
+            }
+            return appDebt.truncatingRemainder(dividingBy: 1) == 0
+                ? "\(Int(appDebt)) ₴ донату"
+                : String(format: "%.1f ₴ донату", appDebt)
+        }
+        return "\(fmt(usedMinutes)) / \(fmt(effectiveLimit))"
     }
 
     private func fmt(_ minutes: Int) -> String {
@@ -455,31 +595,9 @@ struct AppGridCard: View {
         return m == 0 ? "\(h)г" : "\(h)г \(m)хв"
     }
 
-    private var timeSummary: String { "\(fmt(usedMinutes)) / \(fmt(effectiveLimit))" }
-
-    private func weekAggregate(_ getValue: (Date) -> Int) -> Int {
-        let calendar = Calendar.current
-        guard let weekStart = calendar.dateInterval(of: .weekOfYear, for: date)?.start else { return 0 }
-        return (0..<7)
-            .compactMap { calendar.date(byAdding: .day, value: $0, to: weekStart) }
-            .map(getValue)
-            .reduce(0, +)
-    }
 }
 
-private struct AppCardLabelStyle: LabelStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        HStack(spacing: 8) {
-            configuration.icon
-                .frame(width: 28, height: 28)
-                .clipShape(RoundedRectangle(cornerRadius: 7))
-            configuration.title
-                .font(.ktfTitleSmall)
-                .foregroundStyle(.white)
-                .lineLimit(1)
-        }
-    }
-}
+// MARK: - Pie Shape
 
 private struct PieShape: Shape {
     let progress: Double
@@ -609,7 +727,6 @@ struct SettingsSheet: View {
                                         .frame(maxWidth: .infinity, minHeight: 40)
                                         .background {
                                             if rate == selectedRate {
-                                                // Concentric radius: outer 16 − padding 4 = 12
                                                 RoundedRectangle(cornerRadius: 12)
                                                     .fill(Color(hex: "292929"))
                                                     .matchedGeometryEffect(id: "settingsPill", in: pillNamespace)
@@ -639,7 +756,6 @@ struct SettingsSheet: View {
                         .foregroundStyle(.white.opacity(0.5))
 
                     VStack(spacing: 8) {
-                        // Card 1 — середній (selected)
                         HStack(alignment: .top, spacing: 12) {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("середній")
@@ -665,7 +781,6 @@ struct SettingsSheet: View {
                         .padding(16)
                         .background(RoundedRectangle(cornerRadius: 14).fill(Color(hex: "292929")))
 
-                        // Card 2 — важкий (locked)
                         HStack(alignment: .top, spacing: 12) {
                             VStack(alignment: .leading, spacing: 4) {
                                 HStack(spacing: 8) {
@@ -733,7 +848,6 @@ struct SettingsSheet: View {
         appState.activitySelection = selection
         appState.appLimits.removeValue(forKey: appState.tokenKey(token))
     }
-
 }
 
 
