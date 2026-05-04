@@ -15,7 +15,7 @@ import DeviceActivity
 extension DeviceActivityName {
     static let daily = Self("screenoriz.daily")
 }
-
+ 
 class AppState: ObservableObject {
 
     @Published var hasCompletedOnboarding: Bool {
@@ -64,8 +64,7 @@ class AppState: ObservableObject {
 
     let sharedDefaults = UserDefaults(suiteName: "group.app.zymbalevskyi.ScreenoRiz")!
     private var monitoringWorkItem: DispatchWorkItem?
-    // Fires every 30 s so the home screen reflects fresh usage data written by the
-    // monitor extension (a separate process that doesn't trigger @Published changes).
+    // Poll shared defaults because the monitor extension updates data out-of-process.
     private var usageRefreshTimer: AnyCancellable?
 
     init() {
@@ -95,7 +94,7 @@ class AppState: ObservableObject {
         // didSet observers don't fire during init, so we must call this explicitly.
         scheduleMonitoring()
 
-        usageRefreshTimer = Timer.publish(every: 30, on: .main, in: .common)
+        usageRefreshTimer = Timer.publish(every: 5, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in self?.objectWillChange.send() }
     }
@@ -209,24 +208,7 @@ class AppState: ObservableObject {
     }
 
     func getMinutes(forTokenKey key: String, on date: Date) -> Int {
-        var minutes = sharedDefaults.integer(forKey: "usage_\(key)_\(dateKey(for: date))")
-
-        // If there's an active overage session for this exact app today, add elapsed
-        // time on the fly — the monitor extension only writes at threshold intervals,
-        // so without this the card lags until intervalDidEnd fires.
-        if Calendar.current.isDateInToday(date) {
-            let suffix = String(key.filter { $0.isLetter || $0.isNumber }.prefix(12))
-            let timestamp = sharedDefaults.double(forKey: "sessionStart_\(suffix)")
-            let sessionKey = sharedDefaults.string(forKey: "sessionTokenKey_\(suffix)")
-            if timestamp > 0, sessionKey == key {
-                let cap = sharedDefaults.integer(forKey: "sessionMinutes_\(suffix)")
-                let capMinutes = Double(cap > 0 ? cap : 5)
-                let elapsed = min(capMinutes, Date().timeIntervalSince(Date(timeIntervalSince1970: timestamp)) / 60)
-                minutes += Int(elapsed)
-            }
-        }
-
-        return minutes
+        sharedDefaults.integer(forKey: "usage_\(key)_\(dateKey(for: date))")
     }
 
     func getOpens(forTokenKey key: String, on date: Date) -> Int {
@@ -259,42 +241,50 @@ class AppState: ObservableObject {
 
     // MARK: - Monitoring
 
-    /// Debounced entry point — coalesces rapid consecutive calls (e.g. from didSet observers).
+    /// Snapshot of the current monitoring config used to detect when a restart is needed.
+    /// "v2:" prefix forces re-registration when switching from the old single-activity scheme.
+    private func monitoringConfigSnapshot() -> String {
+        let tokens = activitySelection.applicationTokens
+            .map { tokenKey($0) }
+            .sorted()
+            .map { "\($0.prefix(8)):\(appLimits[$0] ?? 15)" }
+            .joined(separator: ",")
+        return "v2:\(tokens)"
+    }
+
+    /// Debounced entry point. Skips the restart if the config is unchanged and
+    /// monitoring is healthy — preserving DeviceActivity's daily accumulation counter.
     func scheduleMonitoring() {
         monitoringWorkItem?.cancel()
-        let work = DispatchWorkItem { [weak self] in self?.startMonitoring() }
+        let work = DispatchWorkItem { [weak self] in
+            guard let self else { return }
+            let snapshot = self.monitoringConfigSnapshot()
+            let stored   = self.sharedDefaults.string(forKey: "monitoringConfigSnapshot") ?? ""
+            let hasError = self.sharedDefaults.object(forKey: "monitoringError") != nil
+            guard snapshot != stored || hasError else { return }
+            self.startMonitoring()
+        }
         monitoringWorkItem = work
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: work)
     }
 
     func startMonitoring() {
         let center = DeviceActivityCenter()
-        center.stopMonitoring([.daily])
-        // Clear stale shields so a newly raised limit (or day change) takes effect
-        // immediately. The monitor extension re-applies shields as apps hit their thresholds.
+        // Stop legacy single-activity monitoring and any existing per-app activities.
+        center.stopMonitoring([.daily] + (0..<20).map { DeviceActivityName("screenoriz.app.\($0)") })
         ManagedSettingsStore().shield.applications = nil
         guard !activitySelection.applicationTokens.isEmpty else { return }
 
-        let schedule = DeviceActivitySchedule(
-            intervalStart: DateComponents(hour: 0, minute: 0, second: 0),
-            intervalEnd: DateComponents(hour: 23, minute: 59, second: 59),
-            repeats: true
-        )
-
-        // Build per-app events sorted by tokenKey so the monitor extension can map
-        // "a{index}_m{minute}" back to the right token.
         let sortedTokens = activitySelection.applicationTokens
             .map { (key: tokenKey($0), token: $0) }
             .sorted { $0.key < $1.key }
 
-        // Persist index → tokenKey map for the monitor extension
         let indexMap = Dictionary(uniqueKeysWithValues:
             sortedTokens.enumerated().map { (String($0.offset), $0.element.key) })
         if let data = try? JSONEncoder().encode(indexMap) {
             sharedDefaults.set(data, forKey: "tokenIndexMap")
         }
 
-        // Persist per-app limits and rate for shield extensions
         let limitsMap = Dictionary(uniqueKeysWithValues:
             sortedTokens.map { ($0.key, appLimits[$0.key] ?? 15) })
         if let data = try? JSONEncoder().encode(limitsMap) {
@@ -302,42 +292,62 @@ class AppState: ObservableObject {
         }
         sharedDefaults.set(ratePerMinute, forKey: "shieldRatePerMinute")
 
-        // Register events at 5-minute intervals up to the per-app limit.
-        // Always include the exact limit so the shield fires precisely on time.
-        // This keeps the event count small (≤ limit/5 + 1 per app) instead of
-        // one event per minute, which was causing heavy system overhead.
-        var events: [DeviceActivityEvent.Name: DeviceActivityEvent] = [:]
+        let schedule = DeviceActivitySchedule(
+            intervalStart: DateComponents(hour: 0, minute: 0, second: 0),
+            intervalEnd: DateComponents(hour: 23, minute: 59, second: 59),
+            repeats: true
+        )
+
+        // One DeviceActivityName per app — each allows up to 20 events independently,
+        // giving dense checkpoints for minute-level accuracy instead of 5 coarse points.
+        var allSucceeded = true
         for (index, item) in sortedTokens.enumerated() {
             let limit = appLimits[item.key] ?? 15
-            // 1-minute granularity for the first 4 minutes so brief usage
-            // (< 5 min) isn't invisible; coarse 5-min intervals after that.
-            let fineCheckpoints = stride(from: 1, through: min(4, limit), by: 1).map { $0 }
-            let coarseCheckpoints = stride(from: 5, through: limit, by: 5).map { $0 }
-            var checkpoints = Array(Set(fineCheckpoints + coarseCheckpoints)).sorted()
-            if !checkpoints.contains(limit) { checkpoints.append(limit) }
-
-            for minute in checkpoints {
-                events[DeviceActivityEvent.Name("a\(index)_m\(minute)")] = DeviceActivityEvent(
+            let activityName = DeviceActivityName("screenoriz.app.\(index)")
+            var events: [DeviceActivityEvent.Name: DeviceActivityEvent] = [:]
+            for minute in perAppCheckpoints(limit: limit) {
+                events[DeviceActivityEvent.Name("m\(minute)")] = DeviceActivityEvent(
                     applications: [item.token],
                     threshold: DateComponents(minute: minute)
                 )
             }
-
-            // Post-limit: 1-minute granularity for 2 hours so we know exactly
-            // how many minutes were used during an overage session.
-            // intervalDidEnd no longer writes usage — it relies on these events.
-            for minute in stride(from: limit + 1, through: limit + 120, by: 1) {
-                events[DeviceActivityEvent.Name("a\(index)_m\(minute)")] = DeviceActivityEvent(
-                    applications: [item.token],
-                    threshold: DateComponents(minute: minute)
+            do {
+                try center.startMonitoring(activityName, during: schedule, events: events)
+            } catch {
+                sharedDefaults.set(
+                    "startMonitoring(app\(index)) failed \(Date()): \(error)",
+                    forKey: "monitoringError"
                 )
+                print("DeviceActivity error app\(index): \(error)")
+                allSucceeded = false
             }
         }
 
-        do {
-            try center.startMonitoring(.daily, during: schedule, events: events)
-        } catch {
-            print("DeviceActivity monitoring error: \(error)")
+        if allSucceeded {
+            sharedDefaults.removeObject(forKey: "monitoringError")
+            sharedDefaults.set(monitoringConfigSnapshot(), forKey: "monitoringConfigSnapshot")
         }
+    }
+
+    // Generates exactly ≤20 minute checkpoints for a given per-app limit.
+    // Budget: 12 slots before/at the limit (proportional to limit size),
+    //         3 fixed overage markers, remainder filled after the limit.
+    // The exact limit minute is always guaranteed in the result so shielding fires.
+    private func perAppCheckpoints(limit: Int) -> [Int] {
+        var pts = Set<Int>()
+
+        // 5 proportionally-spaced pre-limit checkpoints (coarse — pre-limit accuracy is less critical)
+        for i in 0..<5 {
+            pts.insert(max(1, Int((Double(i) / 5.0 * Double(limit)).rounded())))
+        }
+        pts.insert(limit)  // always guaranteed so shielding fires exactly at the limit
+
+        // Dense 5-min post-limit checkpoints fill the remaining slots — debt accuracy is what matters
+        let postSlots = 20 - pts.count
+        for j in 1...max(1, postSlots) {
+            pts.insert(limit + j * 5)
+        }
+
+        return Array(pts.sorted().prefix(20))
     }
 }
