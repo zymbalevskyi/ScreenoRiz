@@ -18,21 +18,22 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
     private let sharedDefaults = UserDefaults(suiteName: "group.app.zymbalevskyi.ScreenoRiz")!
     private let store = ManagedSettingsStore()
 
-    // MARK: – Threshold events ("a{index}_m{minutes}")
+    // MARK: – Threshold events ("m{minutes}" on "screenoriz.app.{index}")
 
     override func eventDidReachThreshold(_ event: DeviceActivityEvent.Name, activity: DeviceActivityName) {
         super.eventDidReachThreshold(event, activity: activity)
-        logger.info("eventDidReachThreshold: \(event.rawValue)")
+        logger.info("eventDidReachThreshold: \(event.rawValue) for \(activity.rawValue)")
 
-        let parts = event.rawValue.split(separator: "_")
-        guard parts.count == 2,
-              parts[0].hasPrefix("a"), parts[1].hasPrefix("m"),
-              let appIndex = Int(parts[0].dropFirst()),
-              let minutes  = Int(parts[1].dropFirst()) else { return }
+        guard let threshold = thresholdInfo(event: event, activity: activity) else {
+            logger.warning("Ignoring threshold with unexpected names: event=\(event.rawValue), activity=\(activity.rawValue)")
+            return
+        }
 
         guard let mapData = sharedDefaults.data(forKey: "tokenIndexMap"),
               let indexMap = try? JSONDecoder().decode([String: String].self, from: mapData),
-              let tokenKey = indexMap[String(appIndex)] else { return }
+              let tokenKey = indexMap[String(threshold.appIndex)] else { return }
+
+        let minutes = threshold.minutes
 
         // Update usage tracking.
         // Always overwrite — DeviceActivity thresholds are cumulative since midnight
@@ -75,13 +76,13 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
 
     // MARK: – Schedule lifecycle
 
-    /// Daily schedule started — reset state if it's a new day.
+    /// A daily or per-app schedule started — reset state if it's a new day.
     override func intervalDidStart(for activity: DeviceActivityName) {
         super.intervalDidStart(for: activity)
-        guard activity == .daily else { return }
-        SharedDefaults.resetIfNewDay()
-        store.shield.applications = nil
-        logger.info("Daily interval started, state reset if new day.")
+        guard activity == .daily || activity.rawValue.hasPrefix("screenoriz.app.") else { return }
+        let didReset = SharedDefaults.resetIfNewDay()
+        if didReset { store.shield.applications = nil }
+        logger.info("Interval started for \(activity.rawValue), didReset=\(didReset)")
     }
 
     /// Called when a per-app overage window expires.
@@ -112,6 +113,27 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
     }
 
     // MARK: – Helpers
+
+    private func thresholdInfo(
+        event: DeviceActivityEvent.Name,
+        activity: DeviceActivityName
+    ) -> (appIndex: Int, minutes: Int)? {
+        let appPrefix = "screenoriz.app."
+        if activity.rawValue.hasPrefix(appPrefix),
+           event.rawValue.hasPrefix("m"),
+           let appIndex = Int(activity.rawValue.dropFirst(appPrefix.count)),
+           let minutes = Int(event.rawValue.dropFirst()) {
+            return (appIndex, minutes)
+        }
+
+        // Backward compatibility with the previous single-activity event naming scheme.
+        let parts = event.rawValue.split(separator: "_")
+        guard parts.count == 2,
+              parts[0].hasPrefix("a"), parts[1].hasPrefix("m"),
+              let appIndex = Int(parts[0].dropFirst()),
+              let minutes = Int(parts[1].dropFirst()) else { return nil }
+        return (appIndex, minutes)
+    }
 
     /// Recomputes dailyDebtUAH as sum(max(0, usage − limit)) × rate across all tracked apps.
     /// Uses the same integer-minute threshold data that HomeView displays, so every view

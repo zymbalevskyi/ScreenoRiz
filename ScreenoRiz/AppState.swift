@@ -254,14 +254,14 @@ class AppState: ObservableObject {
     // MARK: - Monitoring
 
     /// Snapshot of the current monitoring config used to detect when a restart is needed.
-    /// "v2:" prefix forces re-registration when switching from the old single-activity scheme.
+    /// "v3:" forces re-registration for the minute-level threshold scheme.
     private func monitoringConfigSnapshot() -> String {
         let tokens = activitySelection.applicationTokens
             .map { tokenKey($0) }
             .sorted()
             .map { "\($0.prefix(8)):\(appLimits[$0] ?? 15)" }
             .joined(separator: ",")
-        return "v2:\(tokens)"
+        return "v3:\(tokens)"
     }
 
     /// Debounced entry point. Skips the restart if the config is unchanged and
@@ -341,25 +341,36 @@ class AppState: ObservableObject {
         }
     }
 
-    // Generates exactly ≤20 minute checkpoints for a given per-app limit.
-    // Budget: 12 slots before/at the limit (proportional to limit size),
-    //         3 fixed overage markers, remainder filled after the limit.
-    // The exact limit minute is always guaranteed in the result so shielding fires.
+    // Generates up to 20 minute checkpoints for a given per-app limit.
+    // DeviceActivity only gives this app values when thresholds fire, so use
+    // minute-level checkpoints for common short limits and around overage.
+    // The exact limit minute is always guaranteed so shielding fires on time.
     private func perAppCheckpoints(limit: Int) -> [Int] {
+        let limit = max(1, limit)
+
+        if limit <= 20 {
+            return Array(1...20)
+        }
+
         var pts = Set<Int>()
+        pts.insert(1)
+        pts.insert(min(5, limit))
 
-        // 5 proportionally-spaced pre-limit checkpoints (coarse — pre-limit accuracy is less critical)
-        for i in 0..<5 {
-            pts.insert(max(1, Int((Double(i) / 5.0 * Double(limit)).rounded())))
-        }
-        pts.insert(limit)  // always guaranteed so shielding fires exactly at the limit
-
-        // Dense 5-min post-limit checkpoints fill the remaining slots — debt accuracy is what matters
-        let postSlots = 20 - pts.count
-        for j in 1...max(1, postSlots) {
-            pts.insert(limit + j * 5)
+        // Spread checkpoints before the limit so longer limits still show progress.
+        for i in 1...8 {
+            let minute = Int((Double(i) / 8.0 * Double(limit)).rounded())
+            pts.insert(max(1, minute))
         }
 
-        return Array(pts.sorted().prefix(20))
+        pts.insert(limit)
+
+        // Keep post-limit debt precise for as many minutes as the event budget allows.
+        var nextMinute = limit + 1
+        while pts.count < 20 {
+            pts.insert(nextMinute)
+            nextMinute += 1
+        }
+
+        return pts.sorted()
     }
 }
