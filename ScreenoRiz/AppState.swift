@@ -77,7 +77,12 @@ class AppState: ObservableObject {
 
         if let data = UserDefaults.standard.data(forKey: "appLimits"),
            let limits = try? JSONDecoder().decode([String: Int].self, from: data) {
-            self.appLimits = limits
+            let steppedLimits = limits.mapValues(Self.steppedLimitMinutes)
+            self.appLimits = steppedLimits
+            if steppedLimits != limits,
+               let data = try? JSONEncoder().encode(steppedLimits) {
+                UserDefaults.standard.set(data, forKey: "appLimits")
+            }
         } else {
             self.appLimits = [:]
         }
@@ -178,12 +183,19 @@ class AppState: ObservableObject {
         return data.base64EncodedString()
     }
 
+    nonisolated static let limitMinuteStep = 5
+
+    nonisolated static func steppedLimitMinutes(_ minutes: Int) -> Int {
+        let rounded = ((max(0, minutes) + limitMinuteStep / 2) / limitMinuteStep) * limitMinuteStep
+        return min(23 * 60 + 55, max(limitMinuteStep, rounded))
+    }
+
     func getLimit(for token: ApplicationToken) -> Int {
-        appLimits[tokenKey(token)] ?? 15
+        Self.steppedLimitMinutes(appLimits[tokenKey(token)] ?? 15)
     }
 
     func setLimit(_ minutes: Int, for token: ApplicationToken) {
-        appLimits[tokenKey(token)] = max(1, minutes)
+        appLimits[tokenKey(token)] = Self.steppedLimitMinutes(minutes)
     }
 
     // MARK: - Date helpers

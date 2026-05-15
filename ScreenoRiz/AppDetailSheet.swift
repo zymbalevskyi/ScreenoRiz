@@ -40,7 +40,7 @@ struct AppDetailSheet: View {
     private static let expandedHeight:  CGFloat = 740
 
     private let hoursRange = Array(0...23)
-    private let minutesRange = Array(0...59)
+    private let minutesRange = Array(stride(from: 0, through: 55, by: AppState.limitMinuteStep))
 
     // MARK: Computed data
 
@@ -143,7 +143,11 @@ struct AppDetailSheet: View {
         .presentationBackgroundCompat(Color(hex: "121212"))
         .floatingSheetStyle()
         .onAppear {
-            limitMinutes = appState.appLimits[item.id] ?? 15
+            let savedLimit = appState.appLimits[item.id] ?? 15
+            limitMinutes = AppState.steppedLimitMinutes(savedLimit)
+            if savedLimit != limitMinutes {
+                appState.appLimits[item.id] = limitMinutes
+            }
             syncPickerToLimit()
             appState.resolveDisplayNames()
         }
@@ -218,13 +222,16 @@ struct AppDetailSheet: View {
     }
 
     private func syncPickerToLimit() {
+        limitMinutes = AppState.steppedLimitMinutes(limitMinutes)
         pickerHours = limitMinutes / 60
         pickerMinutes = limitMinutes % 60
     }
 
     private func commitLimit() {
-        let total = max(1, pickerHours * 60 + pickerMinutes)
+        let total = AppState.steppedLimitMinutes(pickerHours * 60 + pickerMinutes)
         limitMinutes = total
+        pickerHours = total / 60
+        pickerMinutes = total % 60
         appState.appLimits[item.id] = total
     }
 

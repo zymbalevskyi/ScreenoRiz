@@ -72,7 +72,7 @@ struct HomeView: View {
     @State private var detailItem: AppDetailItem?
     @State private var isRefreshing: Bool = false
     @State private var isSheetExpanded: Bool = false
-    @State private var sheetDragOffset: CGFloat = 0
+    @State private var sheetDragTranslation: CGFloat = 0
 
     private var sortedTokens: [(key: String, token: ApplicationToken)] {
         appState.activitySelection.applicationTokens
@@ -157,7 +157,7 @@ struct HomeView: View {
             }
             .task { appState.resolveDisplayNames() }
             .sheet(isPresented: $showSettings) {
-                SettingsSheet(showAddApp: $showAddApp)
+                SettingsSheet(showAddApp: $showAddApp, currentDate: currentDate)
                     .environmentObject(appState)
             }
             .sheet(isPresented: $showAddApp) {
@@ -324,12 +324,14 @@ struct HomeView: View {
     private var sheetTravel: CGFloat { sheetExpandedHeight - sheetCollapsedHeight }
     private var sheetOffset: CGFloat {
         let base: CGFloat = isSheetExpanded ? 0 : sheetTravel
-        return max(0, min(sheetTravel, base + sheetDragOffset))
+        return max(0, min(sheetTravel, base + sheetDragTranslation))
     }
 
     private var sheetDragGesture: some Gesture {
-        DragGesture(minimumDistance: 8)
-            .onChanged { value in sheetDragOffset = value.translation.height }
+        DragGesture(minimumDistance: 8, coordinateSpace: .global)
+            .onChanged { value in
+                sheetDragTranslation = value.translation.height
+            }
             .onEnded { value in
                 let t = value.translation.height
                 let predicted = value.predictedEndTranslation.height
@@ -339,7 +341,7 @@ struct HomeView: View {
                     } else {
                         if t < -60 || predicted < -120 { isSheetExpanded = true }
                     }
-                    sheetDragOffset = 0
+                    sheetDragTranslation = 0
                 }
             }
     }
@@ -623,11 +625,13 @@ private struct PieShape: Shape {
 struct SettingsSheet: View {
     @EnvironmentObject var appState: AppState
     @Binding var showAddApp: Bool
+    let currentDate: Date
     @Environment(\.dismiss) var dismiss
 
     private let rates: [Double] = [0.5, 1, 2, 3, 4, 5]
     @State private var selectedRate: Double = 1
     @State private var showPickerInSheet = false
+    @State private var detailItem: AppDetailItem?
     @Namespace private var pillNamespace
 
     private var sortedTokens: [(key: String, token: ApplicationToken)] {
@@ -666,23 +670,30 @@ struct SettingsSheet: View {
 
                     List {
                         ForEach(sortedTokens, id: \.key) { item in
-                            HStack {
-                                Group {
-                                    if let name = appState.tokenDisplayNames[item.key] {
-                                        Text(name)
-                                    } else {
-                                        Label(item.token).labelStyle(.titleOnly)
+                            Button {
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                detailItem = AppDetailItem(id: item.key, token: item.token)
+                            } label: {
+                                HStack {
+                                    Group {
+                                        if let name = appState.tokenDisplayNames[item.key] {
+                                            Text(name)
+                                        } else {
+                                            Label(item.token).labelStyle(.titleOnly)
+                                        }
                                     }
+                                    .font(.ktfBody)
+                                    .foregroundStyle(.white)
+                                    Spacer()
+                                    Image("icon-arrow-right")
+                                        .resizable().frame(width: 14, height: 14)
+                                        .foregroundStyle(.white.opacity(0.4))
                                 }
-                                .font(.ktfBody)
-                                .foregroundStyle(.white)
-                                Spacer()
-                                Image("icon-arrow-right")
-                                    .resizable().frame(width: 14, height: 14)
-                                    .foregroundStyle(.white.opacity(0.4))
+                                .frame(minHeight: 60)
+                                .padding(.horizontal, 16)
+                                .contentShape(Rectangle())
                             }
-                            .frame(minHeight: 60)
-                            .padding(.horizontal, 16)
+                            .buttonStyle(.plain)
                             .listRowBackground(RoundedRectangle(cornerRadius: 14).fill(Color(hex: "292929")))
                             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
                             .listRowSeparator(.hidden)
@@ -832,6 +843,10 @@ struct SettingsSheet: View {
                         }
                     }
             }
+        }
+        .sheet(item: $detailItem) { detail in
+            AppDetailSheet(item: detail, currentDate: currentDate)
+                .environmentObject(appState)
         }
     }
 

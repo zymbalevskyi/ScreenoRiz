@@ -91,7 +91,7 @@ struct LimitSelectionView: View {
     private func initializeLimits() {
         for item in sortedTokens {
             if localMinutes[item.key] == nil {
-                localMinutes[item.key] = appState.getLimit(for: item.token)
+                localMinutes[item.key] = AppState.steppedLimitMinutes(appState.getLimit(for: item.token))
             }
         }
         if expandedKey == nil, let first = sortedTokens.first {
@@ -118,7 +118,7 @@ struct AppLimitRow: View {
     @State private var selectedMinutes: Int = 15
 
     private let hoursRange = Array(0...23)
-    private let minutesRange = Array(0...59)
+    private let minutesRange = Array(stride(from: 0, through: 55, by: AppState.limitMinuteStep))
 
     private var timeText: String {
         let h = totalMinutes / 60
@@ -193,19 +193,27 @@ struct AppLimitRow: View {
                     .frame(maxWidth: .infinity)
                     .padding(.bottom, 8)
                 }
-                .onChange(of: selectedHours) { newValue in
-                    totalMinutes = newValue * 60 + selectedMinutes
-                }
-                .onChange(of: selectedMinutes) { newValue in
-                    totalMinutes = selectedHours * 60 + newValue
-                }
+                .onChange(of: selectedHours) { _ in commitSelectedLimit() }
+                .onChange(of: selectedMinutes) { _ in commitSelectedLimit() }
             }
         }
         .background(RoundedRectangle(cornerRadius: 16).fill(Color(hex: "121212")))
         .onAppear {
-            selectedHours = totalMinutes / 60
-            selectedMinutes = totalMinutes % 60
+            syncPickerToLimit()
         }
+    }
+
+    private func syncPickerToLimit() {
+        totalMinutes = AppState.steppedLimitMinutes(totalMinutes)
+        selectedHours = totalMinutes / 60
+        selectedMinutes = totalMinutes % 60
+    }
+
+    private func commitSelectedLimit() {
+        let steppedTotal = AppState.steppedLimitMinutes(selectedHours * 60 + selectedMinutes)
+        totalMinutes = steppedTotal
+        selectedHours = steppedTotal / 60
+        selectedMinutes = steppedTotal % 60
     }
 }
 
