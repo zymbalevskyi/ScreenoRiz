@@ -309,12 +309,39 @@ struct HomeView: View {
                         detailItem = AppDetailItem(id: item.key, token: item.token)
                     }
                 }
+
+                addAppGridButton
             }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(RoundedRectangle(cornerRadius: 6).fill(Color(hex: "121212")))
+    }
+
+    private var addAppGridButton: some View {
+        Button {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            showAddApp = true
+        } label: {
+            VStack(spacing: 18) {
+                Image("icon-add-app")
+                    .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
+                    .foregroundStyle(.white.opacity(0.75))
+                    .frame(width: 38, height: 38)
+
+                Text("додати застосунок")
+                    .font(.ktfCaption)
+                    .foregroundStyle(.white.opacity(0.35))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+            .frame(maxWidth: .infinity, minHeight: 150)
+            .background(RoundedRectangle(cornerRadius: 4).fill(Color.black))
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Expandable Bottom Sheet
@@ -368,7 +395,7 @@ struct HomeView: View {
                         Text("сума донату")
                             .font(.ktfTitle)
                             .foregroundStyle(.white.opacity(0.9))
-                        Text("можете і більше, звісно")
+                        Text("накопичено за цей тиждень")
                             .font(.ktfCaption)
                             .foregroundStyle(.white.opacity(0.4))
                     }
@@ -415,7 +442,7 @@ struct HomeView: View {
                     ForEach(Charity.all) { jar in JarCard(jar: jar) }
                 }
                 .padding(.horizontal, 16)
-                .padding(.top, 4)
+                .padding(.top, 20)
                 .padding(.bottom, 40)
             }
             .scrollDisabled(!isSheetExpanded)
@@ -551,7 +578,7 @@ struct AppGridCard2Col: View {
             }
             .padding(12)
         }
-        .background(RoundedRectangle(cornerRadius: 16).fill(Color(hex: "1C1C1E")))
+        .background(RoundedRectangle(cornerRadius: 4).fill(Color.black))
     }
 
     @ViewBuilder

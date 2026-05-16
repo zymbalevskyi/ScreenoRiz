@@ -1,0 +1,17 @@
+Migration inventory:
+  active: instruction files - 2 found
+    - CLAUDE.md
+    - AGENTS.md
+  inactive: skills - none found
+  inactive: command sources - none found
+  active: subagents - 1 found
+    - swift-code-reviewer
+Migration surfaces:
+  active: AGENTS.md - 1 instruction file(s) found.
+  inactive: skills - No skills found.
+  inactive: MCP config - No settings or MCP config found.
+  active: subagents - 1 subagent(s) converted.
+Migration report:
+  symlinked: AGENTS.md - Linked to /Users/user/ScreenoRiz/CLAUDE.md.
+  manual_fix_required: .codex/agents/swift-code-reviewer.toml - Manual review required for Claude subagent fields: `color`, `memory`.
+  overwritten: /Users/user/ScreenoRiz/.codex/agents/swift-code-reviewer.toml - Existing Codex subagent will be replaced.
