@@ -669,14 +669,19 @@ struct SettingsSheet: View {
 
     var body: some View {
         ZStack {
-            Color(hex: "121212").ignoresSafeArea()
+            settingsSheetBackground
 
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
+                Capsule()
+                    .fill(Color.white.opacity(0.2))
+                    .frame(width: 36, height: 4)
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 12)
+
                 Text("налаштування")
                     .font(.ktfTitleLarge)
                     .foregroundStyle(.white)
-                    .padding(.top, 20)
 
                 // Tracked apps
                 VStack(alignment: .leading, spacing: 8) {
@@ -853,9 +858,9 @@ struct SettingsSheet: View {
             .padding(.bottom, 48)
         }
         }
-        .presentationDragIndicator(.visible)
+        .presentationDragIndicator(.hidden)
         .presentationCornerRadius(20)
-        .presentationBackgroundCompat(Color(hex: "121212"))
+        .presentationBackgroundCompat(.clear)
         .floatingSheetStyle()
         .onAppear {
             selectedRate = appState.ratePerMinute
@@ -874,6 +879,19 @@ struct SettingsSheet: View {
         .sheet(item: $detailItem) { detail in
             AppDetailSheet(item: detail, currentDate: currentDate)
                 .environmentObject(appState)
+        }
+    }
+
+    @ViewBuilder
+    private var settingsSheetBackground: some View {
+        if #available(iOS 26.0, *) {
+            Color(hex: "191919")
+                .opacity(0.9)
+                .glassEffect(.regular.tint(Color(hex: "191919").opacity(0.35)), in: .rect(cornerRadius: 20))
+                .ignoresSafeArea()
+        } else {
+            Color(hex: "191919")
+                .ignoresSafeArea()
         }
     }
 

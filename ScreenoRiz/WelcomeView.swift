@@ -25,7 +25,7 @@ struct WelcomeView: View {
                     .padding(.top, 120)
 
                 // Description Text
-                Text("ScreenoRiz – застосунок, що рахує кожна надмірну хвилину екранного часу як донат на суспільне благо.")
+                Text("Screenoriz – застосунок, що рахує надмірний екранний час як донати на суспільне благо")
                     .font(.ktfTitleLarge)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity, alignment: .leading)
