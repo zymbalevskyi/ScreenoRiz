@@ -13,7 +13,9 @@ import FamilyControls
 
 struct ScreenTimePermissionView: View {
     @EnvironmentObject var appState: AppState
+    @ObservedObject private var authorizationCenter = AuthorizationCenter.shared
     @State private var granted = false
+    @State private var isRequesting = false
     @State private var navigateNext = false
     @Environment(\.dismiss) var dismiss
 
@@ -39,7 +41,12 @@ struct ScreenTimePermissionView: View {
                     .foregroundStyle(.white)
                     .padding(.top, 24)
 
-                PermissionRow(icon: "icon-screentime", title: "екранний час", granted: granted) {
+                PermissionRow(
+                    icon: "icon-screentime",
+                    title: "екранний час",
+                    granted: granted,
+                    isRequesting: isRequesting
+                ) {
                     requestPermission()
                 }
                 .padding(.top, 24)
@@ -72,18 +79,32 @@ struct ScreenTimePermissionView: View {
         .navigationDestination(isPresented: $navigateNext) {
             NotificationsPermissionView()
         }
-        .onAppear {
-            granted = AuthorizationCenter.shared.authorizationStatus == .approved
+        .onAppear(perform: refreshAuthorizationStatus)
+        .onReceive(authorizationCenter.$authorizationStatus) { _ in
+            refreshAuthorizationStatus()
         }
     }
 
     private func requestPermission() {
+        guard !isRequesting else { return }
+        isRequesting = true
+
         Task {
             do {
                 try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
-                await MainActor.run { granted = true }
-            } catch {}
+            } catch {
+                // The user can cancel from the system sheet; keep them on this step.
+            }
+
+            await MainActor.run {
+                refreshAuthorizationStatus()
+                isRequesting = false
+            }
         }
+    }
+
+    private func refreshAuthorizationStatus() {
+        granted = authorizationCenter.authorizationStatus == .approved
     }
 }
 
@@ -172,6 +193,7 @@ private struct PermissionRow: View {
     let icon: String
     let title: String
     let granted: Bool
+    var isRequesting: Bool = false
     let onTap: () -> Void
 
     var body: some View {
@@ -186,18 +208,30 @@ private struct PermissionRow: View {
                     Text(title)
                         .font(.ktfTitleSmall)
                         .foregroundStyle(.white)
-                    Text(granted ? "надано" : "торкніся, щоб увімкнути")
+                    Text(statusText)
                         .font(.ktfBody)
                         .foregroundStyle(.white.opacity(0.6))
                 }
 
                 Spacer()
+
+                if isRequesting {
+                    ProgressView()
+                        .controlSize(.small)
+                        .tint(.white.opacity(0.7))
+                }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 14)
-            .background(RoundedRectangle(cornerRadius: 16).fill(Color(red: 0.2, green: 0.2, blue: 0.2)))
+            .background(RoundedRectangle(cornerRadius: 16).fill(Color(red: 0.16, green: 0.16, blue: 0.16)))
         }
-        .disabled(granted)
+        .disabled(granted || isRequesting)
+    }
+
+    private var statusText: String {
+        if granted { return "надано" }
+        if isRequesting { return "відкриваємо системний дозвіл..." }
+        return "торкніся, щоб увімкнути"
     }
 }
 

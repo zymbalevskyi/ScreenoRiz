@@ -1,57 +1,9 @@
 //
-//  CharitiesView.swift
+//  JarCard.swift
 //  ScreenoRiz
 //
 
 import SwiftUI
-
-// MARK: - Sheet
-
-struct CharitiesView: View {
-    let donationAmount: String
-
-    var body: some View {
-        ZStack {
-            Color(hex: "121212").ignoresSafeArea()
-
-            VStack(spacing: 0) {
-                // Donation amount header
-                HStack(alignment: .top, spacing: 8) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("сума донату")
-                            .font(.ktfTitle)
-                            .foregroundStyle(.white.opacity(0.9))
-                        Text("можете і більше, звісно")
-                            .font(.ktfCaption)
-                            .foregroundStyle(.white.opacity(0.4))
-                    }
-                    Spacer()
-                    Text(donationAmount)
-                        .font(.ktfTitleSmall)
-                        .foregroundStyle(.white)
-                        .lineLimit(1)
-                }
-                .padding(.horizontal, 20)
-                .padding(.top, 24)
-                .padding(.bottom, 20)
-
-                // Jar cards
-                ScrollView {
-                    VStack(spacing: 12) {
-                        ForEach(Charity.all) { jar in
-                            JarCard(jar: jar)
-                        }
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 40)
-                }
-            }
-        }
-        .presentationDetents([.large])
-        .presentationDragIndicator(.visible)
-        .presentationBackgroundCompat(Color(hex: "121212"))
-    }
-}
 
 // MARK: - Card
 
@@ -139,6 +91,3 @@ struct JarCard: View {
 }
 
 
-#Preview {
-    CharitiesView(donationAmount: "93 ₴")
-}

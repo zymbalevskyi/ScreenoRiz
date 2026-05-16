@@ -21,8 +21,13 @@ class AppState: ObservableObject {
     @Published var hasCompletedOnboarding: Bool {
         didSet {
             UserDefaults.standard.set(hasCompletedOnboarding, forKey: "hasCompletedOnboarding")
-            if hasCompletedOnboarding && UserDefaults.standard.object(forKey: "firstUsedDate") == nil {
-                UserDefaults.standard.set(Calendar.current.startOfDay(for: Date()), forKey: "firstUsedDate")
+            if hasCompletedOnboarding {
+                if UserDefaults.standard.object(forKey: "firstUsedDate") == nil {
+                    UserDefaults.standard.set(Calendar.current.startOfDay(for: Date()), forKey: "firstUsedDate")
+                }
+                scheduleMonitoring()
+            } else {
+                monitoringWorkItem?.cancel()
             }
         }
     }
@@ -37,7 +42,7 @@ class AppState: ObservableObject {
             if let data = try? JSONEncoder().encode(activitySelection) {
                 sharedDefaults.set(data, forKey: "activitySelection")
             }
-            scheduleMonitoring()
+            if hasCompletedOnboarding { scheduleMonitoring() }
         }
     }
 
@@ -46,7 +51,7 @@ class AppState: ObservableObject {
             if let data = try? JSONEncoder().encode(appLimits) {
                 UserDefaults.standard.set(data, forKey: "appLimits")
             }
-            scheduleMonitoring()
+            if hasCompletedOnboarding { scheduleMonitoring() }
         }
     }
 
@@ -95,9 +100,9 @@ class AppState: ObservableObject {
             self.activitySelection = FamilyActivitySelection()
         }
 
-        // Re-register monitoring on every app launch so it doesn't silently stop.
+        // Re-register monitoring on every post-onboarding app launch so it doesn't silently stop.
         // didSet observers don't fire during init, so we must call this explicitly.
-        scheduleMonitoring()
+        if hasCompletedOnboarding { scheduleMonitoring() }
 
         usageRefreshTimer = Timer.publish(every: 5, on: .main, in: .common)
             .autoconnect()

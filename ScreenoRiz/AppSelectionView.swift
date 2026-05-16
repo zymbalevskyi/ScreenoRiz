@@ -79,8 +79,7 @@ struct AppSelectionView: View {
         }
         .familyActivityPicker(isPresented: $showingPicker, selection: $selection)
         .onChange(of: selection) { newSelection in
-            // Persist and kick off monitoring immediately so the monitor extension
-            // resolves app names before the user navigates to LimitSelectionView.
+            // Persist during onboarding; monitoring starts only after onboarding is complete.
             appState.activitySelection = newSelection
         }
         .onAppear {
