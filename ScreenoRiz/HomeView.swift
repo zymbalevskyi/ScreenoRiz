@@ -347,6 +347,9 @@ struct HomeView: View {
     // MARK: - Expandable Bottom Sheet
 
     private let sheetCollapsedHeight: CGFloat = 140
+    private let sheetDragStartDistance: CGFloat = 4
+    private let sheetDragCommitThreshold: CGFloat = 40
+    private let sheetPredictedCommitThreshold: CGFloat = 90
     private var sheetExpandedHeight: CGFloat { UIScreen.main.bounds.height * 0.88 }
     private var sheetTravel: CGFloat { sheetExpandedHeight - sheetCollapsedHeight }
     private var sheetOffset: CGFloat {
@@ -354,8 +357,14 @@ struct HomeView: View {
         return max(0, min(sheetTravel, base + sheetDragTranslation))
     }
 
+    private func toggleCharitiesSheet() {
+        withAnimation(.spring(response: 0.42, dampingFraction: 0.82)) {
+            isSheetExpanded.toggle()
+        }
+    }
+
     private var sheetDragGesture: some Gesture {
-        DragGesture(minimumDistance: 8, coordinateSpace: .global)
+        DragGesture(minimumDistance: sheetDragStartDistance, coordinateSpace: .global)
             .onChanged { value in
                 sheetDragTranslation = value.translation.height
             }
@@ -364,9 +373,13 @@ struct HomeView: View {
                 let predicted = value.predictedEndTranslation.height
                 withAnimation(.spring(response: 0.42, dampingFraction: 0.82)) {
                     if isSheetExpanded {
-                        if t > 60 || predicted > 120 { isSheetExpanded = false }
+                        if t > sheetDragCommitThreshold || predicted > sheetPredictedCommitThreshold {
+                            isSheetExpanded = false
+                        }
                     } else {
-                        if t < -60 || predicted < -120 { isSheetExpanded = true }
+                        if t < -sheetDragCommitThreshold || predicted < -sheetPredictedCommitThreshold {
+                            isSheetExpanded = true
+                        }
                     }
                     sheetDragTranslation = 0
                 }
@@ -409,32 +422,34 @@ struct HomeView: View {
                 .padding(.top, 20)
                 .padding(.bottom, 16)
 
-                // Tappable text-divider row — replaces the old button
-                Button {
-                    withAnimation(.spring(response: 0.42, dampingFraction: 0.82)) {
-                        isSheetExpanded.toggle()
-                    }
-                } label: {
-                    HStack(spacing: 12) {
-                        Rectangle()
-                            .fill(Color.white.opacity(0.12))
-                            .frame(height: 1)
-                        Text("куди задонатити ?")
-                            .font(.ktfCaption)
-                            .foregroundStyle(.white.opacity(0.35))
-                            .fixedSize()
-                        Rectangle()
-                            .fill(Color.white.opacity(0.12))
-                            .frame(height: 1)
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 12)
+                HStack(spacing: 12) {
+                    Rectangle()
+                        .fill(Color.white.opacity(0.12))
+                        .frame(height: 1)
+                    Text("куди задонатити ?")
+                        .font(.ktfCaption)
+                        .foregroundStyle(.white.opacity(0.35))
+                        .fixedSize()
+                    Rectangle()
+                        .fill(Color.white.opacity(0.12))
+                        .frame(height: 1)
                 }
-                .buttonStyle(.plain)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
             }
             .frame(height: sheetCollapsedHeight, alignment: .top)
             .clipped()
+            .contentShape(Rectangle())
+            .onTapGesture {
+                toggleCharitiesSheet()
+            }
             .highPriorityGesture(sheetDragGesture)
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.isButton)
+            .accessibilityLabel(isSheetExpanded ? "згорнути список фондів" : "розгорнути список фондів")
+            .accessibilityAction {
+                toggleCharitiesSheet()
+            }
 
             // ── Charity cards ─────────────────────────────────────────────
             ScrollView {
