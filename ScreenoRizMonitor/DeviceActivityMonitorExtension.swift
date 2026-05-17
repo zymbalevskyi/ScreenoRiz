@@ -18,7 +18,7 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
     private let sharedDefaults = UserDefaults(suiteName: "group.app.zymbalevskyi.ScreenoRiz")!
     private let store = ManagedSettingsStore()
 
-    // MARK: – Threshold events ("m{minutes}" on "screenoriz.app.{index}")
+    // MARK: – Threshold events ("m{minutes}" on "screenoriz.app.{generation}.{index}.{suffix}")
 
     override func eventDidReachThreshold(_ event: DeviceActivityEvent.Name, activity: DeviceActivityName) {
         super.eventDidReachThreshold(event, activity: activity)
@@ -29,10 +29,7 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
             return
         }
 
-        guard let mapData = sharedDefaults.data(forKey: "tokenIndexMap"),
-              let indexMap = try? JSONDecoder().decode([String: String].self, from: mapData),
-              let tokenKey = indexMap[String(threshold.appIndex)] else { return }
-
+        let tokenKey = threshold.tokenKey
         let minutes = threshold.minutes
 
         // Update usage tracking.
@@ -117,42 +114,39 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
     private func thresholdInfo(
         event: DeviceActivityEvent.Name,
         activity: DeviceActivityName
-    ) -> (appIndex: Int, minutes: Int)? {
+    ) -> (tokenKey: String, minutes: Int)? {
         let appPrefix = "screenoriz.app."
-        if activity.rawValue.hasPrefix(appPrefix),
-           event.rawValue.hasPrefix("m"),
-           let appIndex = Int(activity.rawValue.dropFirst(appPrefix.count)),
-           let minutes = Int(event.rawValue.dropFirst()) {
-            return (appIndex, minutes)
+        guard activity.rawValue.hasPrefix(appPrefix),
+              event.rawValue.hasPrefix("m"),
+              let minutes = Int(event.rawValue.dropFirst()) else {
+            return nil
         }
 
-        // Backward compatibility with the previous single-activity event naming scheme.
-        let parts = event.rawValue.split(separator: "_")
-        guard parts.count == 2,
-              parts[0].hasPrefix("a"), parts[1].hasPrefix("m"),
-              let appIndex = Int(parts[0].dropFirst()),
-              let minutes = Int(parts[1].dropFirst()) else { return nil }
-        return (appIndex, minutes)
+        guard let mapData = sharedDefaults.data(forKey: "activityTokenMap"),
+              let activityTokenMap = try? JSONDecoder().decode([String: String].self, from: mapData),
+              let tokenKey = activityTokenMap[activity.rawValue] else {
+            logger.warning("Ignoring stale or unknown activity callback: \(activity.rawValue)")
+            return nil
+        }
+
+        return (tokenKey, minutes)
     }
 
     /// Recomputes dailyDebtUAH as sum(max(0, usage − limit)) × rate across all tracked apps.
     /// Uses the same integer-minute threshold data that HomeView displays, so every view
     /// in the app shows a consistent donation figure.
     private func recomputeDailyDebt() {
-        guard let mapData = sharedDefaults.data(forKey: "tokenIndexMap"),
-              let indexMap = try? JSONDecoder().decode([String: String].self, from: mapData),
-              let limitsData = sharedDefaults.data(forKey: "sharedAppLimits"),
+        guard let limitsData = sharedDefaults.data(forKey: "sharedAppLimits"),
               let limitsMap = try? JSONDecoder().decode([String: Int].self, from: limitsData)
         else {
-            logger.warning("recomputeDailyDebt: missing tokenIndexMap or sharedAppLimits")
+            logger.warning("recomputeDailyDebt: missing sharedAppLimits")
             return
         }
 
         let today = todayKey()
         var totalExcess = 0
-        for (_, tokenKey) in indexMap {
+        for (tokenKey, limit) in limitsMap {
             let usage = sharedDefaults.integer(forKey: "usage_\(tokenKey)_\(today)")
-            let limit = limitsMap[tokenKey] ?? 15
             totalExcess += max(0, usage - limit)
         }
 
@@ -179,6 +173,7 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = .autoupdatingCurrent
         return formatter.string(from: Date())
     }
 }

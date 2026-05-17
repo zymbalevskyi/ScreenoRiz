@@ -71,6 +71,7 @@ class AppState: ObservableObject {
     private var monitoringWorkItem: DispatchWorkItem?
     // Poll shared defaults because the monitor extension updates data out-of-process.
     private var usageRefreshTimer: AnyCancellable?
+    private static let usageDataVersion = "v4"
 
     init() {
         self.hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
@@ -99,6 +100,8 @@ class AppState: ObservableObject {
         } else {
             self.activitySelection = FamilyActivitySelection()
         }
+
+        migrateSharedUsageIfNeeded()
 
         // Re-register monitoring on every post-onboarding app launch so it doesn't silently stop.
         // didSet observers don't fire during init, so we must call this explicitly.
@@ -209,6 +212,7 @@ class AppState: ObservableObject {
         let f = DateFormatter()
         f.dateFormat = "yyyy-MM-dd"
         f.locale = Locale(identifier: "en_US_POSIX")
+        f.timeZone = .autoupdatingCurrent
         return f
     }()
 
@@ -259,14 +263,48 @@ class AppState: ObservableObject {
     // MARK: - Monitoring
 
     /// Snapshot of the current monitoring config used to detect when a restart is needed.
-    /// "v3:" forces re-registration for the minute-level threshold scheme.
+    /// "v4:" forces re-registration for generation-safe activity names.
     private func monitoringConfigSnapshot() -> String {
         let tokens = activitySelection.applicationTokens
             .map { tokenKey($0) }
             .sorted()
             .map { "\($0.prefix(8)):\(appLimits[$0] ?? 15)" }
             .joined(separator: ",")
-        return "v3:\(tokens)"
+        return "v4:\(tokens)"
+    }
+
+    private func migrateSharedUsageIfNeeded() {
+        let versionKey = "usageDataVersion"
+        guard sharedDefaults.string(forKey: versionKey) != Self.usageDataVersion else { return }
+
+        let prefixesToRemove = [
+            "usage_",
+            "opens_",
+            "sessionTokenKey_",
+            "sessionStart_",
+            "sessionMinutes_"
+        ]
+        for key in sharedDefaults.dictionaryRepresentation().keys
+        where prefixesToRemove.contains(where: { key.hasPrefix($0) }) {
+            sharedDefaults.removeObject(forKey: key)
+        }
+
+        [
+            "dailyDebtUAH",
+            "currentSessionStart",
+            "currentSessionTokenKey",
+            "chosenSessionMinutes",
+            "isFirstShieldToday",
+            "activeSessionSuffixes",
+            "tokenIndexMap",
+            "activityTokenMap",
+            "monitoringActivityNames",
+            "monitoringGeneration",
+            "monitoringConfigSnapshot",
+            "monitoringError"
+        ].forEach { sharedDefaults.removeObject(forKey: $0) }
+
+        sharedDefaults.set(Self.usageDataVersion, forKey: versionKey)
     }
 
     /// Debounced entry point. Skips the restart if the config is unchanged and
@@ -287,20 +325,25 @@ class AppState: ObservableObject {
 
     func startMonitoring() {
         let center = DeviceActivityCenter()
-        // Stop legacy single-activity monitoring and any existing per-app activities.
-        center.stopMonitoring([.daily] + (0..<20).map { DeviceActivityName("screenoriz.app.\($0)") })
+        let storedActivityNames = sharedDefaults.stringArray(forKey: "monitoringActivityNames") ?? []
+        var namesToStop: [DeviceActivityName] = [.daily]
+        namesToStop.append(contentsOf: (0..<20).map { DeviceActivityName("screenoriz.app.\($0)") })
+        namesToStop.append(contentsOf: storedActivityNames.map { DeviceActivityName($0) })
+        center.stopMonitoring(namesToStop)
         ManagedSettingsStore().shield.applications = nil
-        guard !activitySelection.applicationTokens.isEmpty else { return }
+        guard !activitySelection.applicationTokens.isEmpty else {
+            sharedDefaults.removeObject(forKey: "tokenIndexMap")
+            sharedDefaults.removeObject(forKey: "activityTokenMap")
+            sharedDefaults.removeObject(forKey: "monitoringActivityNames")
+            sharedDefaults.removeObject(forKey: "monitoringGeneration")
+            sharedDefaults.set(monitoringConfigSnapshot(), forKey: "monitoringConfigSnapshot")
+            return
+        }
 
         let sortedTokens = activitySelection.applicationTokens
             .map { (key: tokenKey($0), token: $0) }
             .sorted { $0.key < $1.key }
-
-        let indexMap = Dictionary(uniqueKeysWithValues:
-            sortedTokens.enumerated().map { (String($0.offset), $0.element.key) })
-        if let data = try? JSONEncoder().encode(indexMap) {
-            sharedDefaults.set(data, forKey: "tokenIndexMap")
-        }
+        let generation = UUID().uuidString.replacingOccurrences(of: "-", with: "").lowercased()
 
         let limitsMap = Dictionary(uniqueKeysWithValues:
             sortedTokens.map { ($0.key, appLimits[$0.key] ?? 15) })
@@ -315,12 +358,26 @@ class AppState: ObservableObject {
             repeats: true
         )
 
-        // One DeviceActivityName per app — each allows up to 20 events independently,
-        // giving dense checkpoints for minute-level accuracy instead of 5 coarse points.
+        // One generated DeviceActivityName per app keeps threshold callbacks tied to
+        // the exact registration that created them.
         var allSucceeded = true
+        var activityTokenMap: [String: String] = [:]
+        var monitoringActivityNames: [String] = []
+        for (index, item) in sortedTokens.enumerated() {
+            let suffix = String(item.key.filter { $0.isLetter || $0.isNumber }.prefix(12))
+            let rawActivityName = "screenoriz.app.\(generation).\(index).\(suffix)"
+            activityTokenMap[rawActivityName] = item.key
+            monitoringActivityNames.append(rawActivityName)
+        }
+        if let data = try? JSONEncoder().encode(activityTokenMap) {
+            sharedDefaults.set(data, forKey: "activityTokenMap")
+        }
+        sharedDefaults.set(monitoringActivityNames, forKey: "monitoringActivityNames")
+        sharedDefaults.set(generation, forKey: "monitoringGeneration")
+
         for (index, item) in sortedTokens.enumerated() {
             let limit = appLimits[item.key] ?? 15
-            let activityName = DeviceActivityName("screenoriz.app.\(index)")
+            let activityName = DeviceActivityName(monitoringActivityNames[index])
             var events: [DeviceActivityEvent.Name: DeviceActivityEvent] = [:]
             for minute in perAppCheckpoints(limit: limit) {
                 events[DeviceActivityEvent.Name("m\(minute)")] = DeviceActivityEvent(
@@ -353,18 +410,17 @@ class AppState: ObservableObject {
     private func perAppCheckpoints(limit: Int) -> [Int] {
         let limit = max(1, limit)
 
-        if limit <= 20 {
-            return Array(1...20)
-        }
-
         var pts = Set<Int>()
-        pts.insert(1)
-        pts.insert(min(5, limit))
+        let firstCheckpoint = min(5, limit)
+        pts.insert(firstCheckpoint)
 
-        // Spread checkpoints before the limit so longer limits still show progress.
-        for i in 1...8 {
-            let minute = Int((Double(i) / 8.0 * Double(limit)).rounded())
-            pts.insert(max(1, minute))
+        // Use only a small pre-limit budget so more of the 20 event slots remain
+        // available for donation debt after the limit is reached.
+        if limit > firstCheckpoint {
+            for i in 1...4 {
+                let minute = Int((Double(i) / 4.0 * Double(limit)).rounded())
+                pts.insert(min(limit, max(firstCheckpoint, minute)))
+            }
         }
 
         pts.insert(limit)
