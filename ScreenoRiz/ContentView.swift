@@ -32,6 +32,13 @@ struct ContentView: View {
                 }
             }
         }
+        .onChange(of: scenePhase) { _, phase in
+            guard phase == .active,
+                  appState.hasCompletedOnboarding,
+                  authCenter.authorizationStatus == .approved else { return }
+            appState.resetSharedStateIfNewDay()
+            appState.scheduleMonitoring()
+        }
     }
 }
 

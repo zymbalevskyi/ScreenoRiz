@@ -23,40 +23,51 @@ struct AppSelectionView: View {
                 NavBar(onBack: { dismiss() })
                     .padding(.horizontal, 32)
 
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 0) {
                     Text("обери соцмережі")
                         .font(.ktfTitleLarge)
                         .foregroundStyle(.white)
-
-                    Text("обери мережі, у яких хочеш проводити менше часу")
-                        .font(.ktfBody)
-                        .foregroundStyle(.white.opacity(0.6))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 32)
                 .padding(.top, 24)
-                .padding(.bottom, 32)
 
                 // Picker trigger
                 Button { showingPicker = true } label: {
-                    HStack {
+                    HStack(spacing: 12) {
+                        Image("icon-add-app")
+                            .renderingMode(.template)
+                            .resizable()
+                            .frame(width: 24, height: 24)
+                            .foregroundStyle(.black)
+
                         VStack(alignment: .leading, spacing: 6) {
                             Text("обрані застосунки")
                                 .font(.ktfTitleSmall)
-                                .foregroundStyle(.white)
+                                .foregroundStyle(.black)
                             Text(selectionSummary)
                                 .font(.ktfBody)
-                                .foregroundStyle(.white.opacity(0.6))
+                                .foregroundStyle(.black.opacity(0.6))
                         }
                         Spacer()
                         Image("icon-arrow-right")
-                            .resizable().frame(width: 16, height: 16)
-                            .foregroundStyle(.white.opacity(0.4))
+                            .resizable()
+                            .frame(width: 16, height: 16)
+                            .foregroundStyle(.black.opacity(0.6))
                     }
-                    .padding(16)
-                    .background(RoundedRectangle(cornerRadius: 16).fill(Color(hex: "121212")))
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 14)
+                    .background(RoundedRectangle(cornerRadius: 16).fill(Color.white))
                 }
                 .padding(.horizontal, 32)
+                .padding(.top, 24)
+
+                Text("обери зі списку мережі, у яких хочеш\nпроводити менше часу")
+                    .font(.ktfBody)
+                    .foregroundStyle(.white.opacity(0.6))
+                    .padding(.horizontal, 32)
+                    .padding(.top, 12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
                 Spacer()
 

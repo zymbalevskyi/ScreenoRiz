@@ -12,7 +12,9 @@ class ShieldActionExtension: ShieldActionDelegate {
         for application: ApplicationToken,
         completionHandler: @escaping (ShieldActionResponse) -> Void
     ) {
-        SharedDefaults.resetIfNewDay()
+        if SharedDefaults.resetIfNewDay() {
+            store.shield.applications = nil
+        }
 
         switch action {
 
@@ -73,6 +75,7 @@ class ShieldActionExtension: ShieldActionDelegate {
         var active = SharedDefaults.activeSessionSuffixes
         active.insert(suffix)
         SharedDefaults.activeSessionSuffixes = active
+        SharedDefaults.synchronize()
 
         var shielded = store.shield.applications ?? []
         shielded.remove(application)

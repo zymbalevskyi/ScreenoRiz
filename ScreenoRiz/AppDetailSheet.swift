@@ -40,7 +40,6 @@ struct AppDetailSheet: View {
     private static let expandedHeight:  CGFloat = 740
 
     private let hoursRange = Array(0...23)
-    private let minutesRange = Array(stride(from: 0, through: 55, by: AppState.limitMinuteStep))
 
     // MARK: Computed data
 
@@ -201,7 +200,7 @@ struct AppDetailSheet: View {
                         .padding(.horizontal, 8)
 
                     Picker("", selection: $pickerMinutes) {
-                        ForEach(minutesRange, id: \.self) { m in
+                        ForEach(AppState.limitMinutePickerValues(forHours: pickerHours), id: \.self) { m in
                             Text("\(m)").foregroundStyle(.white).tag(m)
                         }
                     }

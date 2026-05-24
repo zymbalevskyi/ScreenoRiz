@@ -118,7 +118,6 @@ struct AppLimitRow: View {
     @State private var selectedMinutes: Int = 15
 
     private let hoursRange = Array(0...23)
-    private let minutesRange = Array(stride(from: 0, through: 55, by: AppState.limitMinuteStep))
 
     private var timeText: String {
         let h = totalMinutes / 60
@@ -176,7 +175,7 @@ struct AppLimitRow: View {
                             .padding(.horizontal, 12)
 
                         Picker("Minutes", selection: $selectedMinutes) {
-                            ForEach(minutesRange, id: \.self) { m in
+                            ForEach(AppState.limitMinutePickerValues(forHours: selectedHours), id: \.self) { m in
                                 Text("\(m)")
                                     .foregroundStyle(.white)
                                     .tag(m)

@@ -201,16 +201,16 @@ private struct PermissionRow: View {
             HStack(spacing: 16) {
                 Image(icon)
                     .resizable().frame(width: 24, height: 24)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.black)
                     .frame(width: 44, height: 44)
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(title)
                         .font(.ktfTitleSmall)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.black)
                     Text(statusText)
                         .font(.ktfBody)
-                        .foregroundStyle(.white.opacity(0.6))
+                        .foregroundStyle(.black.opacity(0.6))
                 }
 
                 Spacer()
@@ -223,14 +223,14 @@ private struct PermissionRow: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 14)
-            .background(RoundedRectangle(cornerRadius: 16).fill(Color(red: 0.16, green: 0.16, blue: 0.16)))
+            .background(RoundedRectangle(cornerRadius: 16).fill(Color(red: 1, green: 1, blue: 1)))
         }
         .disabled(granted || isRequesting)
     }
 
     private var statusText: String {
         if granted { return "надано" }
-        if isRequesting { return "відкриваємо системний дозвіл..." }
+        if isRequesting { return "відкриваємо дозвіл..." }
         return "торкніся, щоб увімкнути"
     }
 }

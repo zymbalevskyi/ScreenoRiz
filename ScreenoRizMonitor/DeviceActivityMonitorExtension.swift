@@ -23,6 +23,7 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
     override func eventDidReachThreshold(_ event: DeviceActivityEvent.Name, activity: DeviceActivityName) {
         super.eventDidReachThreshold(event, activity: activity)
         logger.info("eventDidReachThreshold: \(event.rawValue) for \(activity.rawValue)")
+        SharedDefaults.resetIfNewDay()
 
         guard let threshold = thresholdInfo(event: event, activity: activity) else {
             logger.warning("Ignoring threshold with unexpected names: event=\(event.rawValue), activity=\(activity.rawValue)")
@@ -41,13 +42,14 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
         sharedDefaults.set(minutes, forKey: usageKey)
         logger.info("wrote \(usageKey) = \(minutes)")
         recomputeDailyDebt()
+        SharedDefaults.synchronize()
 
         guard let limit = SharedDefaults.appLimit(forTokenKey: tokenKey) else { return }
 
         if minutes == limit {
             // Shield when the per-app limit is first reached
-            SharedDefaults.resetIfNewDay()
             if SharedDefaults.dailyDebtUAH <= 0 { SharedDefaults.isFirstShieldToday = true }
+            SharedDefaults.synchronize()
             shieldApp(tokenKey: tokenKey)
             return
         }
@@ -68,6 +70,7 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
         var active = SharedDefaults.activeSessionSuffixes
         active.remove(suffix)
         SharedDefaults.activeSessionSuffixes = active
+        SharedDefaults.synchronize()
         shieldApp(tokenKey: tokenKey)
     }
 
@@ -102,6 +105,7 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
 
         // Recompute debt from threshold data — keeps dailyDebtUAH in sync with HomeView
         recomputeDailyDebt()
+        SharedDefaults.synchronize()
 
         // Re-shield the correct app
         if let tokenKey = sessionTokenKey {
@@ -152,6 +156,7 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
 
         let rate = SharedDefaults.ratePerMinute
         SharedDefaults.dailyDebtUAH = Double(totalExcess) * rate
+        SharedDefaults.synchronize()
         logger.info("recomputeDailyDebt: \(totalExcess) excess min × \(rate)₴ = \(SharedDefaults.dailyDebtUAH)₴")
     }
 

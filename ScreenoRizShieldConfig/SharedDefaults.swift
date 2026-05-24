@@ -2,7 +2,7 @@ import Foundation
 
 enum SharedDefaults {
     static let suiteName = "group.app.zymbalevskyi.ScreenoRiz"
-    static var store: UserDefaults { UserDefaults(suiteName: suiteName)! }
+    static var store: UserDefaults { UserDefaults(suiteName: suiteName) ?? .standard }
 
     // MARK: – Keys
     static let keyDailyDebtUAH           = "dailyDebtUAH"
@@ -116,10 +116,26 @@ enum SharedDefaults {
     }
 
     // MARK: – Daily reset
+    static func prepareForShieldPresentation() {
+        let today = todayString()
+        guard store.string(forKey: keyTodayDate) != today else { return }
+
+        store.set(0.0,   forKey: keyDailyDebtUAH)
+        store.set(true,  forKey: keyIsFirstShieldToday)
+        store.set(5,     forKey: keyChosenSessionMinutes)
+        store.removeObject(forKey: keyCurrentSessionStart)
+        store.removeObject(forKey: keyCurrentSessionTokenKey)
+        for suffix in activeSessionSuffixes { clearSession(forSuffix: suffix) }
+        store.removeObject(forKey: "activeSessionSuffixes")
+        store.set(today, forKey: keyTodayDate)
+        store.synchronize()
+    }
+
     @discardableResult
     static func resetIfNewDay() -> Bool {
         let today = todayString()
         guard store.string(forKey: keyTodayDate) != today else { return false }
+        clearUsageValues(forDateKey: today)
         store.set(0.0,   forKey: keyDailyDebtUAH)
         store.set(true,  forKey: keyIsFirstShieldToday)
         store.set(5,     forKey: keyChosenSessionMinutes)
@@ -129,7 +145,16 @@ enum SharedDefaults {
         for suffix in activeSessionSuffixes { clearSession(forSuffix: suffix) }
         store.removeObject(forKey: "activeSessionSuffixes")
         store.set(today, forKey: keyTodayDate)
+        store.synchronize()
         return true
+    }
+
+    private static func clearUsageValues(forDateKey dateKey: String) {
+        let suffix = "_\(dateKey)"
+        for key in store.dictionaryRepresentation().keys
+        where (key.hasPrefix("usage_") || key.hasPrefix("opens_")) && key.hasSuffix(suffix) {
+            store.removeObject(forKey: key)
+        }
     }
 
     static func todayString() -> String {
